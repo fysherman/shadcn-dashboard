@@ -5,7 +5,6 @@ import type { Metadata } from 'next';
 import NextTopLoader from 'nextjs-toploader';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { auth } from '@/auth';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -16,10 +15,9 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
-  const session = await auth();
+}>) {
   return (
     <html lang="en">
       <body
@@ -27,7 +25,7 @@ export default async function RootLayout({
         suppressHydrationWarning={true}
       >
         <NextTopLoader showSpinner={false} />
-        <Providers session={session}>
+        <Providers>
           <Toaster />
           {children}
         </Providers>

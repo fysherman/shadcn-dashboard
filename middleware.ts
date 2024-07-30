@@ -1,17 +1,22 @@
 // Protecting routes with next-auth
-// https://next-auth.js.org/configuration/nextjs#middleware
 // https://nextjs.org/docs/app/building-your-application/routing/middleware
 
-import NextAuth from 'next-auth';
-import authConfig from './auth.config';
+import { NextRequest, NextResponse } from 'next/server';
 
-const { auth } = NextAuth(authConfig);
+export function middleware(request: NextRequest) {
+  if (request.nextUrl.pathname === '/')
+    return NextResponse.redirect(new URL('/sign-in', request.url));
+}
 
-export default auth((req) => {
-  if (!req.auth) {
-    const url = req.url.replace(req.nextUrl.pathname, '/');
-    return Response.redirect(url);
-  }
-});
-
-export const config = { matcher: ['/dashboard/:path*'] };
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico).*)'
+  ]
+};
