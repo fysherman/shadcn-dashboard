@@ -8,7 +8,7 @@ import {
   getPaginationRowModel,
   useReactTable
 } from '@tanstack/react-table';
-import React from 'react';
+import React, { Suspense } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -48,12 +48,10 @@ interface DataTableProps<TData, TValue> {
   };
 }
 
-export function EmployeeTable<TData, TValue>({
+function Component<TData, TValue>({
   columns,
   data,
-  pageNo,
   searchKey,
-  totalUsers,
   pageCount,
   pageSizeOptions = [10, 20, 30, 40, 50]
 }: DataTableProps<TData, TValue>) {
@@ -127,33 +125,6 @@ export function EmployeeTable<TData, TValue>({
   });
 
   const searchValue = table.getColumn(searchKey)?.getFilterValue() as string;
-
-  // React.useEffect(() => {
-  //   if (debounceValue.length > 0) {
-  //     router.push(
-  //       `${pathname}?${createQueryString({
-  //         [selectedOption.value]: `${debounceValue}${
-  //           debounceValue.length > 0 ? `.${filterVariety}` : ""
-  //         }`,
-  //       })}`,
-  //       {
-  //         scroll: false,
-  //       }
-  //     )
-  //   }
-
-  //   if (debounceValue.length === 0) {
-  //     router.push(
-  //       `${pathname}?${createQueryString({
-  //         [selectedOption.value]: null,
-  //       })}`,
-  //       {
-  //         scroll: false,
-  //       }
-  //     )
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [debounceValue, filterVariety, selectedOption.value])
 
   React.useEffect(() => {
     if (searchValue?.length > 0) {
@@ -327,5 +298,15 @@ export function EmployeeTable<TData, TValue>({
         </div>
       </div>
     </>
+  );
+}
+
+export function EmployeeTable<TData, TValue>(
+  props: DataTableProps<TData, TValue>
+) {
+  return (
+    <Suspense>
+      <Component {...props} />
+    </Suspense>
   );
 }
