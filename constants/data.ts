@@ -130,6 +130,12 @@ export const navItems: NavItem[] = [
     label: 'employee'
   },
   {
+    title: 'Quản lí nghỉ phép',
+    href: '/dashboard/leave',
+    icon: 'calendar',
+    label: 'leave'
+  },
+  {
     title: 'Profile',
     href: '/dashboard/profile',
     icon: 'profile',

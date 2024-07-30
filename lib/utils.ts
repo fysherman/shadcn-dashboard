@@ -27,3 +27,9 @@ export function hasDraggableData<T extends Active | Over>(
 
   return false;
 }
+
+export function delay(time: number = 0): Promise<undefined> {
+  return new Promise((res) => {
+    setTimeout(res, time);
+  });
+}
