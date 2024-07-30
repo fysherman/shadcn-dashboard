@@ -1,10 +1,9 @@
 {
-  "name": "nextshcdndashboardstarter",
+  "name": "table-hub",
   "version": "0.1.0",
   "private": true,
   "author": {
-    "name": "Kiran",
-    "url": "https://github.com/Kiranism"
+    "name": "fysherman"
   },
   "scripts": {
     "dev": "next dev",
