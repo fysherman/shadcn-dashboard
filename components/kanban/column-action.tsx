@@ -1,6 +1,7 @@
 'use client';
 import { DotsHorizontalIcon } from '@radix-ui/react-icons';
 import * as React from 'react';
+import { toast } from 'sonner';
 
 import {
   AlertDialog,
@@ -19,7 +20,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { useToast } from '@/components/ui/use-toast';
 import { useTaskStore } from '@/lib/store';
 import { UniqueIdentifier } from '@dnd-kit/core';
 import { Input } from '../ui/input';
@@ -27,17 +27,16 @@ import { Input } from '../ui/input';
 export function ColumnActions({
   title,
   id
-}: {
+}: Readonly<{
   title: string;
   id: UniqueIdentifier;
-}) {
+}>) {
   const [name, setName] = React.useState(title);
   const updateCol = useTaskStore((state) => state.updateCol);
   const removeCol = useTaskStore((state) => state.removeCol);
   const [editDisable, setIsEditDisable] = React.useState(true);
   const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
 
   return (
     <>
@@ -46,11 +45,7 @@ export function ColumnActions({
           e.preventDefault();
           setIsEditDisable(!editDisable);
           updateCol(id, name);
-          toast({
-            title: 'Name Updated',
-            variant: 'default',
-            description: `${title} updated to ${name}`
-          });
+          toast.success(`${title} updated to ${name}`);
         }}
       >
         <Input
@@ -109,9 +104,7 @@ export function ColumnActions({
 
                 setShowDeleteDialog(false);
                 removeCol(id);
-                toast({
-                  description: 'This column has been deleted.'
-                });
+                toast('This column has been deleted.');
               }}
             >
               Delete

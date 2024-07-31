@@ -1,5 +1,5 @@
 import Providers from '@/components/layout/providers';
-import { Toaster } from '@/components/ui/toaster';
+import { Toaster } from '@/components/ui/sonner';
 import '@uploadthing/react/styles.css';
 import type { Metadata } from 'next';
 import NextTopLoader from 'nextjs-toploader';
@@ -26,7 +26,7 @@ export default async function RootLayout({
       >
         <NextTopLoader showSpinner={false} />
         <Providers>
-          <Toaster />
+          <Toaster richColors />
           {children}
         </Providers>
       </body>

@@ -1,5 +1,6 @@
 'use client';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 import {
   Form,
   FormControl,
@@ -25,7 +26,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import FileUpload from '../file-upload';
-import { useToast } from '../ui/use-toast';
+
 const ImgSchema = z.object({
   fileName: z.string(),
   name: z.string(),
@@ -65,7 +66,6 @@ export const EmployeeForm: React.FC<ProductFormProps> = ({
 }) => {
   const params = useParams();
   const router = useRouter();
-  const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const title = initialData ? 'Edit product' : 'Create product';
@@ -91,23 +91,13 @@ export const EmployeeForm: React.FC<ProductFormProps> = ({
   const onSubmit = async (data: ProductFormValues) => {
     try {
       setLoading(true);
-      if (initialData) {
-        // await axios.post(`/api/products/edit-product/${initialData._id}`, data);
-      } else {
-        // const res = await axios.post(`/api/products/create-product`, data);
-        // console.log("product", res);
-      }
       router.refresh();
       router.push(`/dashboard/products`);
-      toast({
-        variant: 'destructive',
-        title: 'Uh oh! Something went wrong.',
+      toast.error('Uh oh! Something went wrong.', {
         description: 'There was a problem with your request.'
       });
     } catch (error: any) {
-      toast({
-        variant: 'destructive',
-        title: 'Uh oh! Something went wrong.',
+      toast.error('Uh oh! Something went wrong.', {
         description: 'There was a problem with your request.'
       });
     } finally {
@@ -118,7 +108,6 @@ export const EmployeeForm: React.FC<ProductFormProps> = ({
   const onDelete = async () => {
     try {
       setLoading(true);
-      //   await axios.delete(`/api/${params.storeId}/products/${params.productId}`);
       router.refresh();
       router.push(`/${params.storeId}/products`);
     } catch (error: any) {
