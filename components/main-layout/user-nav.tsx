@@ -1,6 +1,7 @@
 'use client';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { Badge } from '../ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,31 +9,35 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
+import { useRouter } from 'next/navigation';
 
 export function UserNav() {
+  const router = useRouter();
   const session = {
     user: {
       image: '',
-      name: '',
-      email: ''
+      name: 'Duy Khanh',
+      email: 'khanh@gmail.com'
     }
   };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <Avatar className="h-8 w-8">
-            <AvatarImage
-              src={session.user?.image ?? ''}
-              alt={session.user?.name ?? ''}
-            />
-            <AvatarFallback>{session.user?.name?.[0]}</AvatarFallback>
-          </Avatar>
-        </Button>
+        <div className=" relative">
+          <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+            <Avatar className="h-8 w-8">
+              <AvatarImage
+                src={session.user?.image ?? ''}
+                alt={session.user?.name ?? ''}
+              />
+              <AvatarFallback>{session.user?.name?.[0] ?? 'A'}</AvatarFallback>
+            </Avatar>
+          </Button>
+          <span className=" absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-red-500" />
+        </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
@@ -46,25 +51,17 @@ export function UserNav() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuGroup>
+        <DropdownMenuGroup onClick={() => router.push('/setting/profile')}>
           <DropdownMenuItem>
             Profile
-            <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+            <Badge variant="destructive" className=" ml-auto">
+              Update
+            </Badge>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            Billing
-            <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            Settings
-            <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-          </DropdownMenuItem>
-          <DropdownMenuItem>New Team</DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => {}}>
+        <DropdownMenuItem className=" text-red-500" onClick={() => {}}>
           Log out
-          <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

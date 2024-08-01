@@ -1,4 +1,4 @@
-import Providers from '@/components/layout/providers';
+import Providers from '@/components/main-layout/providers';
 import { Toaster } from '@/components/ui/sonner';
 import '@uploadthing/react/styles.css';
 import type { Metadata } from 'next';
@@ -9,8 +9,7 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Next Shadcn',
-  description: 'Basic dashboard with Next.js and Shadcn'
+  title: 'Talent Hub'
 };
 
 export default async function RootLayout({
@@ -24,7 +23,7 @@ export default async function RootLayout({
         className={`${inter.className} overflow-hidden `}
         suppressHydrationWarning={true}
       >
-        <NextTopLoader showSpinner={false} />
+        <NextTopLoader color="#16a34a" showSpinner={false} />
         <Providers>
           <Toaster richColors />
           {children}

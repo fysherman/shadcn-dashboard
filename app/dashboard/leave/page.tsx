@@ -1,6 +1,6 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import FullCalendar from '@/components/calendar/full-calendar';
-import PageContainer from '@/components/layout/page-container';
+import PageContainer from '@/components/main-layout/page-container';
 
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },

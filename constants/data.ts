@@ -112,6 +112,12 @@ export type Employee = {
 
 export const navItems: NavItem[] = [
   {
+    title: 'Quản lí',
+    href: '/dashboard/talent',
+    icon: 'dashboard',
+    label: 'Talent'
+  },
+  {
     title: 'Dashboard',
     href: '/dashboard',
     icon: 'dashboard',
@@ -122,12 +128,6 @@ export const navItems: NavItem[] = [
     href: '/dashboard/user',
     icon: 'user',
     label: 'user'
-  },
-  {
-    title: 'Employee',
-    href: '/dashboard/employee',
-    icon: 'employee',
-    label: 'employee'
   },
   {
     title: 'Quản lí nghỉ phép',

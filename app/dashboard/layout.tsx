@@ -1,10 +1,9 @@
-import Header from '@/components/layout/header';
-import Sidebar from '@/components/layout/sidebar';
+import Header from '@/components/main-layout/header';
+import Sidebar from '@/components/main-layout/sidebar';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Next Shadcn Dashboard Starter',
-  description: 'Basic dashboard with Next.js and Shadcn'
+  title: 'Talent Hub'
 };
 
 export default function DashboardLayout({

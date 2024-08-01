@@ -1,6 +1,6 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { CreateProfileOne } from '@/components/forms/user-profile-stepper/create-profile';
-import PageContainer from '@/components/layout/page-container';
+import PageContainer from '@/components/main-layout/page-container';
 
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },

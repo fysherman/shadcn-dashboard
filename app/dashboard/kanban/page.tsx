@@ -1,7 +1,7 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { KanbanBoard } from '@/components/kanban/kanban-board';
 import NewTaskDialog from '@/components/kanban/new-task-dialog';
-import PageContainer from '@/components/layout/page-container';
+import PageContainer from '@/components/main-layout/page-container';
 import { Heading } from '@/components/ui/heading';
 
 const breadcrumbItems = [
