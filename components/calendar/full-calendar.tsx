@@ -5,7 +5,11 @@ import { useSidebar } from '@/hooks/useSidebar';
 import { useEffect, useRef } from 'react';
 import { delay } from '@/lib/utils';
 
-export default function FullCalendar() {
+export default function FullCalendar({
+  setOpenCreate
+}: Readonly<{
+  setOpenCreate: (state: boolean) => void;
+}>) {
   const ref = useRef<Calendar>(null);
   const isMinimized = useSidebar((state) => state.isMinimized);
 
@@ -27,7 +31,19 @@ export default function FullCalendar() {
       ref={ref}
       plugins={[dayGridPlugin]}
       initialView="dayGridMonth"
-      aspectRatio={1.5}
+      aspectRatio={2}
+      fixedWeekCount={false}
+      customButtons={{
+        createButton: {
+          text: 'Xin nghỉ phép',
+          click() {
+            setOpenCreate(true);
+          }
+        }
+      }}
+      headerToolbar={{
+        right: 'today prev,next createButton'
+      }}
     />
   );
 }

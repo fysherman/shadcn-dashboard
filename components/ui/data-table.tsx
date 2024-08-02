@@ -16,6 +16,7 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
+import { cn } from '@/lib/utils';
 import { Input } from './input';
 import { Button } from './button';
 import { ScrollArea, ScrollBar } from './scroll-area';
@@ -24,13 +25,15 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   searchKey: string;
+  height?: string;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
-  searchKey
-}: DataTableProps<TData, TValue>) {
+  searchKey,
+  height
+}: Readonly<DataTableProps<TData, TValue>>) {
   const table = useReactTable({
     data,
     columns,
@@ -51,7 +54,9 @@ export function DataTable<TData, TValue>({
         }
         className="w-full md:max-w-sm"
       />
-      <ScrollArea className="h-[calc(80vh-220px)] rounded-md border md:h-[calc(80dvh-200px)]">
+      <ScrollArea
+        className={cn('h-[calc(80dvh-200px)] rounded-md border', height)}
+      >
         <Table className="relative">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
