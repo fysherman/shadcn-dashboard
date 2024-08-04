@@ -1,8 +1,7 @@
 'use client';
-import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-
-import { Task, useTaskStore } from '@/lib/store';
+import { Task, useTaskStore, ColumnId } from '@/lib/store';
 import { hasDraggableData } from '@/lib/utils';
 import {
   Announcements,
@@ -13,65 +12,26 @@ import {
   UniqueIdentifier,
   useSensor,
   useSensors,
-  type DragEndEvent,
   type DragOverEvent,
   type DragStartEvent
 } from '@dnd-kit/core';
 import { SortableContext, arrayMove } from '@dnd-kit/sortable';
 import type { Column } from './board-column';
 import { BoardColumn, BoardContainer } from './board-column';
-import NewSectionDialog from './new-section-dialog';
 import { TaskCard } from './task-card';
-// import { coordinateGetter } from "./multipleContainersKeyboardPreset";
-
-const defaultCols = [
-  {
-    id: 'TODO' as const,
-    title: 'Todo'
-  },
-  {
-    id: 'IN_PROGRESS' as const,
-    title: 'In progress'
-  },
-  {
-    id: 'DONE' as const,
-    title: 'Done'
-  }
-] satisfies Column[];
-
-export type ColumnId = (typeof defaultCols)[number]['id'];
 
 export function KanbanBoard() {
-  // const [columns, setColumns] = useState<Column[]>(defaultCols);
   const columns = useTaskStore((state) => state.columns);
-  const setColumns = useTaskStore((state) => state.setCols);
+  console.log(columns);
   const pickedUpTaskColumn = useRef<ColumnId | null>(null);
   const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
 
-  // const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const tasks = useTaskStore((state) => state.tasks);
   const setTasks = useTaskStore((state) => state.setTasks);
-  const [activeColumn, setActiveColumn] = useState<Column | null>(null);
-  const [isMounted, setIsMounted] = useState<Boolean>(false);
 
   const [activeTask, setActiveTask] = useState<Task | null>(null);
 
-  const sensors = useSensors(
-    useSensor(MouseSensor),
-    useSensor(TouchSensor)
-    // useSensor(KeyboardSensor, {
-    //   coordinateGetter: coordinateGetter,
-    // }),
-  );
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, [isMounted]);
-
-  useEffect(() => {
-    useTaskStore.persist.rehydrate();
-  }, []);
-  if (!isMounted) return;
+  const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
 
   function getDraggingTaskData(taskId: UniqueIdentifier, columnId: ColumnId) {
     const tasksInColumn = tasks.filter((task) => task.status === columnId);
@@ -87,13 +47,8 @@ export function KanbanBoard() {
   const announcements: Announcements = {
     onDragStart({ active }) {
       if (!hasDraggableData(active)) return;
-      if (active.data.current?.type === 'Column') {
-        const startColumnIdx = columnsId.findIndex((id) => id === active.id);
-        const startColumn = columns[startColumnIdx];
-        return `Picked up Column ${startColumn?.title} at position: ${
-          startColumnIdx + 1
-        } of ${columnsId.length}`;
-      } else if (active.data.current?.type === 'Task') {
+
+      if (active.data.current?.type === 'Task') {
         pickedUpTaskColumn.current = active.data.current.task.status;
         const { tasksInColumn, taskPosition, column } = getDraggingTaskData(
           active.id,
@@ -108,14 +63,6 @@ export function KanbanBoard() {
       if (!hasDraggableData(active) || !hasDraggableData(over)) return;
 
       if (
-        active.data.current?.type === 'Column' &&
-        over.data.current?.type === 'Column'
-      ) {
-        const overColumnIdx = columnsId.findIndex((id) => id === over.id);
-        return `Column ${active.data.current.column.title} was moved over ${
-          over.data.current.column.title
-        } at position ${overColumnIdx + 1} of ${columnsId.length}`;
-      } else if (
         active.data.current?.type === 'Task' &&
         over.data.current?.type === 'Task'
       ) {
@@ -141,17 +88,6 @@ export function KanbanBoard() {
         return;
       }
       if (
-        active.data.current?.type === 'Column' &&
-        over.data.current?.type === 'Column'
-      ) {
-        const overColumnPosition = columnsId.findIndex((id) => id === over.id);
-
-        return `Column ${
-          active.data.current.column.title
-        } was dropped into position ${overColumnPosition + 1} of ${
-          columnsId.length
-        }`;
-      } else if (
         active.data.current?.type === 'Task' &&
         over.data.current?.type === 'Task'
       ) {
@@ -189,33 +125,20 @@ export function KanbanBoard() {
     >
       <BoardContainer>
         <SortableContext items={columnsId}>
-          {columns?.map((col, index) => (
+          {columns?.map((col) => (
             <Fragment key={col.id}>
               <BoardColumn
                 column={col}
                 tasks={tasks.filter((task) => task.status === col.id)}
               />
-              {index === columns?.length - 1 && (
-                <div className="w-[300px]">
-                  <NewSectionDialog />
-                </div>
-              )}
             </Fragment>
           ))}
-          {!columns.length && <NewSectionDialog />}
         </SortableContext>
       </BoardContainer>
 
       {'document' in window &&
         createPortal(
           <DragOverlay>
-            {activeColumn && (
-              <BoardColumn
-                isOverlay
-                column={activeColumn}
-                tasks={tasks.filter((task) => task.status === activeColumn.id)}
-              />
-            )}
             {activeTask && <TaskCard task={activeTask} isOverlay />}
           </DragOverlay>,
           document.body
@@ -225,11 +148,8 @@ export function KanbanBoard() {
 
   function onDragStart(event: DragStartEvent) {
     if (!hasDraggableData(event.active)) return;
+
     const data = event.active.data.current;
-    if (data?.type === 'Column') {
-      setActiveColumn(data.column);
-      return;
-    }
 
     if (data?.type === 'Task') {
       setActiveTask(data.task);
@@ -237,30 +157,8 @@ export function KanbanBoard() {
     }
   }
 
-  function onDragEnd(event: DragEndEvent) {
-    setActiveColumn(null);
+  function onDragEnd() {
     setActiveTask(null);
-
-    const { active, over } = event;
-    if (!over) return;
-
-    const activeId = active.id;
-    const overId = over.id;
-
-    if (!hasDraggableData(active)) return;
-
-    const activeData = active.data.current;
-
-    if (activeId === overId) return;
-
-    const isActiveAColumn = activeData?.type === 'Column';
-    if (!isActiveAColumn) return;
-
-    const activeColumnIndex = columns.findIndex((col) => col.id === activeId);
-
-    const overColumnIndex = columns.findIndex((col) => col.id === overId);
-
-    setColumns(arrayMove(columns, activeColumnIndex, overColumnIndex));
   }
 
   function onDragOver(event: DragOverEvent) {

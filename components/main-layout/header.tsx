@@ -1,5 +1,4 @@
 import React from 'react';
-import ThemeToggle from '@/components/main-layout/ThemeToggle/theme-toggle';
 import { UserNav } from './user-nav';
 
 export default function Header() {
@@ -8,7 +7,6 @@ export default function Header() {
       <nav className="flex items-center px-4 py-2">
         <div className="ml-auto flex items-center gap-2">
           <UserNav />
-          <ThemeToggle />
         </div>
       </nav>
     </header>

@@ -3,11 +3,8 @@ import { useDndContext, type UniqueIdentifier } from '@dnd-kit/core';
 import { SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { cva } from 'class-variance-authority';
-import { GripVertical } from 'lucide-react';
 import { useMemo } from 'react';
-import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader } from '../ui/card';
-import { ColumnActions } from './column-action';
 import { TaskCard } from './task-card';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
@@ -34,14 +31,7 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
     return tasks.map((task) => task.id);
   }, [tasks]);
 
-  const {
-    setNodeRef,
-    attributes,
-    listeners,
-    transform,
-    transition,
-    isDragging
-  } = useSortable({
+  const { setNodeRef, transform, transition, isDragging } = useSortable({
     id: column.id,
     data: {
       type: 'Column',
@@ -58,7 +48,7 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
   };
 
   const variants = cva(
-    'h-[75vh] max-h-[75vh] w-[350px] max-w-full bg-secondary flex flex-col flex-shrink-0 snap-center',
+    'h-[75vh] max-h-[75vh] col-span-1 max-w-full bg-gray-100 flex flex-col flex-shrink-0 snap-center',
     {
       variants: {
         dragging: {
@@ -78,28 +68,16 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
         dragging: isOverlay ? 'overlay' : isDragging ? 'over' : undefined
       })}
     >
-      <CardHeader className="space-between flex flex-row items-center border-b-2 p-4 text-left font-semibold">
-        <Button
-          variant={'ghost'}
-          {...attributes}
-          {...listeners}
-          className=" relative -ml-2 h-auto cursor-grab p-1 text-primary/50"
-        >
-          <span className="sr-only">{`Move column: ${column.title}`}</span>
-          <GripVertical />
-        </Button>
-        {/* <span className="mr-auto !mt-0"> {column.title}</span> */}
-        {/* <Input
-          defaultValue={column.title}
-          className="text-base !mt-0 mr-auto"
-        /> */}
-        <ColumnActions id={column.id} title={column.title} />
+      <CardHeader className="flex flex-row items-center p-4 text-left font-semibold">
+        <p className=" text-base">{column.title}</p>
       </CardHeader>
       <CardContent className="flex flex-grow flex-col gap-4 overflow-x-hidden p-2">
         <ScrollArea className="h-full">
           <SortableContext items={tasksIds}>
             {tasks.map((task) => (
-              <TaskCard key={task.id} task={task} />
+              <div key={task.id} className="mb-4">
+                <TaskCard task={task} />
+              </div>
             ))}
           </SortableContext>
         </ScrollArea>
@@ -127,9 +105,7 @@ export function BoardContainer({ children }: { children: React.ReactNode }) {
           dragging: dndContext.active ? 'active' : 'default'
         })}
       >
-        <div className="flex flex-row items-start justify-center gap-4">
-          {children}
-        </div>
+        <div className=" grid w-full grid-cols-3 gap-4">{children}</div>
       </div>
       <ScrollBar orientation="horizontal" />
     </ScrollArea>

@@ -34,7 +34,7 @@ const TalentTable: React.FC<Props> = ({ data }) => {
         searchKey="name"
         columns={columns}
         data={data}
-        height=" h-[calc(100vh-320px)]"
+        height=" h-[calc(100vh-300px)]"
       />
     </>
   );

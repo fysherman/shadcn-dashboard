@@ -11,66 +11,174 @@ import {
   DialogTrigger
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from '@/components/ui/form';
 import { Textarea } from '../ui/textarea';
-
-import { useTaskStore } from '@/lib/store';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { TaskSchema, taskSchema } from '@/lib/form-schema';
+import { useForm } from 'react-hook-form';
+import { Popover, PopoverContent } from '../ui/popover';
+import { PopoverTrigger } from '@radix-ui/react-popover';
+import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
+import { Icons } from '../icons';
+import { Calendar } from '../ui/calendar';
+import { toast } from 'sonner';
+import { useEffect, useState } from 'react';
 
 export default function NewTaskDialog() {
-  const addTask = useTaskStore((state) => state.addTask);
+  const form = useForm<TaskSchema>({
+    resolver: zodResolver(taskSchema),
+    defaultValues: {
+      title: '',
+      description: '',
+      startDate: new Date(),
+      endDate: new Date(),
+      assigner: ''
+    }
+  });
+  const [open, setOpen] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  function handleSubmit() {
+    toast.success('Tạo task thành công');
 
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-    const { title, description } = Object.fromEntries(formData);
+    setOpen(false);
+  }
 
-    if (typeof title !== 'string' || typeof description !== 'string') return;
-    addTask(title, description);
-  };
+  useEffect(() => {
+    if (!open) form.reset();
+  }, [open]);
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="secondary" size="sm">
-          ＋ Add New Todo
-        </Button>
+        <Button>＋ Tạo task</Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className=" max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Add New Todo</DialogTitle>
-          <DialogDescription>
-            What do you want to get done today?
-          </DialogDescription>
+          <DialogTitle>Tạo task</DialogTitle>
+          <DialogDescription>Task công việc</DialogDescription>
         </DialogHeader>
-        <form
-          id="todo-form"
-          className="grid gap-4 py-4"
-          onSubmit={handleSubmit}
-        >
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Input
-              id="title"
+        <Form {...form}>
+          <form
+            id="task-form"
+            className=" space-y-4 py-4"
+            onSubmit={form.handleSubmit(handleSubmit)}
+          >
+            <FormField
+              control={form.control}
+              name="startDate"
+              render={({ field }) => (
+                <FormItem className=" flex flex-col">
+                  <FormLabel>Start date</FormLabel>
+                  <Popover modal>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={'outline'}
+                          className={cn(
+                            'w-[240px] pl-3 text-left font-normal',
+                            !field.value && 'text-muted-foreground'
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, 'PPP')
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <Icons.calendar className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="endDate"
+              render={({ field }) => (
+                <FormItem className=" flex flex-col">
+                  <FormLabel>End date</FormLabel>
+                  <Popover modal>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={'outline'}
+                          className={cn(
+                            'w-[240px] pl-3 text-left font-normal',
+                            !field.value && 'text-muted-foreground'
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, 'PPP')
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <Icons.calendar className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="title"
-              placeholder="Todo title..."
-              className="col-span-4"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tiêu đề</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Textarea
-              id="description"
+            <FormField
+              control={form.control}
               name="description"
-              placeholder="Description..."
-              className="col-span-4"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Mô tả</FormLabel>
+                  <FormControl>
+                    <Textarea {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-        </form>
+          </form>
+        </Form>
         <DialogFooter>
-          <DialogTrigger asChild>
-            <Button type="submit" size="sm" form="todo-form">
-              Add Todo
-            </Button>
-          </DialogTrigger>
+          <Button type="submit" form="task-form">
+            Tạo task
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

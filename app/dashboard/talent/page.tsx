@@ -5,7 +5,7 @@ import TalentTable from '@/components/tables/talent-tables';
 
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
-  { title: 'User', link: '/dashboard/user' }
+  { title: 'Talent', link: '/dashboard/talent' }
 ];
 
 export default function Page() {

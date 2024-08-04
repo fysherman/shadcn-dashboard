@@ -6,7 +6,7 @@ import { Heading } from '@/components/ui/heading';
 
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
-  { title: 'Kanban', link: '/dashboard/kanban' }
+  { title: 'Task', link: '/dashboard/task' }
 ];
 
 export default function page() {
@@ -15,7 +15,7 @@ export default function page() {
       <div className="space-y-4">
         <Breadcrumbs items={breadcrumbItems} />
         <div className="flex items-start justify-between">
-          <Heading title={`Kanban`} description="Manage tasks by dnd" />
+          <Heading title="Task" description="Quản lí task" />
           <NewTaskDialog />
         </div>
         <KanbanBoard />

@@ -117,18 +117,18 @@ export const navItems: NavItem[] = [
     icon: 'dashboard',
     label: 'Talent'
   },
-  {
-    title: 'Dashboard',
-    href: '/dashboard',
-    icon: 'dashboard',
-    label: 'Dashboard'
-  },
-  {
-    title: 'User',
-    href: '/dashboard/user',
-    icon: 'user',
-    label: 'user'
-  },
+  // {
+  //   title: 'Dashboard',
+  //   href: '/dashboard',
+  //   icon: 'dashboard',
+  //   label: 'Dashboard'
+  // },
+  // {
+  //   title: 'User',
+  //   href: '/dashboard/user',
+  //   icon: 'user',
+  //   label: 'user'
+  // },
   {
     title: 'Quản lí nghỉ phép',
     href: '/dashboard/leave',
@@ -136,21 +136,27 @@ export const navItems: NavItem[] = [
     label: 'leave'
   },
   {
-    title: 'Profile',
-    href: '/dashboard/profile',
-    icon: 'profile',
-    label: 'profile'
-  },
-  {
-    title: 'Kanban',
-    href: '/dashboard/kanban',
+    title: 'Task',
+    href: '/dashboard/task',
     icon: 'kanban',
-    label: 'kanban'
-  },
-  {
-    title: 'Login',
-    href: '/',
-    icon: 'login',
-    label: 'login'
+    label: 'task'
   }
+  // {
+  //   title: 'Profile',
+  //   href: '/dashboard/profile',
+  //   icon: 'profile',
+  //   label: 'profile'
+  // },
+  // {
+  //   title: 'Kanban',
+  //   href: '/dashboard/kanban',
+  //   icon: 'kanban',
+  //   label: 'kanban'
+  // },
+  // {
+  //   title: 'Login',
+  //   href: '/',
+  //   icon: 'login',
+  //   label: 'login'
+  // }
 ];
