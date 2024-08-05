@@ -1,4 +1,6 @@
 'use client';
+import { useAuth } from '@/api/auth';
+import { useEmployees } from '@/api/employee';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -11,11 +13,12 @@ import {
 import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
 const formSchema = z.object({
-  email: z.string().email({ message: 'Enter a valid email address' }),
+  username: z.string(),
   password: z.string()
 });
 
@@ -23,31 +26,45 @@ type UserFormValue = z.infer<typeof formSchema>;
 
 export default function UserAuthForm() {
   const router = useRouter();
+  const { trigger, loading, error, data: res } = useAuth();
   const defaultValues = {
-    email: 'demo@gmail.com'
+    username: '',
+    password: ''
   };
   const form = useForm<UserFormValue>({
     resolver: zodResolver(formSchema),
     defaultValues
   });
 
-  const onSubmit = async (data: UserFormValue) => {
-    router.push('/dashboard');
-  };
+  const { trigger: test } = useEmployees();
+  async function handleSubmit(data: UserFormValue) {
+    await trigger({ body: data });
+  }
+
+  useEffect(() => {
+    console.log('🚀 ~ useEffect ~ res:', res);
+    if (!res?.token) return;
+
+    localStorage.setItem('token', res.token);
+    test({});
+  }, [res]);
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-2">
+      <form
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className="w-full space-y-2"
+      >
         <FormField
           control={form.control}
-          name="email"
+          name="username"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>Username</FormLabel>
               <FormControl>
                 <Input
-                  type="email"
-                  placeholder="Enter your email..."
+                  type="text"
+                  placeholder="Enter your account"
                   {...field}
                 />
               </FormControl>
@@ -73,8 +90,8 @@ export default function UserAuthForm() {
           )}
         />
 
-        <Button className="ml-auto w-full" type="submit">
-          Continue With Email
+        <Button className="ml-auto w-full" type="submit" disabled={loading}>
+          Continue
         </Button>
       </form>
     </Form>
