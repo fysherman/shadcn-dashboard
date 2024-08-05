@@ -1,5 +1,9 @@
 import { Icons } from '@/components/icons';
 
+export type Nullable<T> = {
+  [K in keyof T]: T[K] | null;
+};
+
 export interface NavItem {
   title: string;
   href?: string;
@@ -30,3 +34,14 @@ export interface FooterItem {
 export type MainNavItem = NavItemWithOptionalChildren;
 
 export type SidebarNavItem = NavItemWithChildren;
+
+export type Employee = Nullable<{
+  id: number;
+  email: string;
+  employee_type: string;
+  fullname: string;
+  image_profile: string;
+  username: string;
+  department: string;
+  birth_year: number;
+}>;

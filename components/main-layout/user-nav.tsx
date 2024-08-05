@@ -23,6 +23,12 @@ export function UserNav() {
     }
   };
 
+  function handleLogout() {
+    localStorage.removeItem('token');
+
+    router.push('/sign-in');
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -60,7 +66,7 @@ export function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className=" text-red-500" onClick={() => {}}>
+        <DropdownMenuItem className=" text-red-500" onClick={handleLogout}>
           Log out
         </DropdownMenuItem>
       </DropdownMenuContent>

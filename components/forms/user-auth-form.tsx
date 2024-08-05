@@ -1,6 +1,4 @@
 'use client';
-import { useAuth } from '@/api/auth';
-import { useEmployees } from '@/api/employee';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -13,41 +11,50 @@ import {
 import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-
-const formSchema = z.object({
-  username: z.string(),
-  password: z.string()
-});
-
-type UserFormValue = z.infer<typeof formSchema>;
+import { authSchema, AuthSchema } from '@/lib/form-schema';
+import { toast } from 'sonner';
+import useFetcher from '@/lib/fetcher';
+import ENDPOINT from '@/constants/endpoint';
 
 export default function UserAuthForm() {
   const router = useRouter();
-  const { trigger, loading, error, data: res } = useAuth();
-  const defaultValues = {
-    username: '',
-    password: ''
-  };
-  const form = useForm<UserFormValue>({
-    resolver: zodResolver(formSchema),
-    defaultValues
+  const { trigger, loading } = useFetcher({
+    url: ENDPOINT.LOGIN,
+    method: 'POST'
+  });
+  const form = useForm<AuthSchema>({
+    resolver: zodResolver(authSchema),
+    defaultValues: {
+      username: '',
+      password: ''
+    }
   });
 
-  const { trigger: test } = useEmployees();
-  async function handleSubmit(data: UserFormValue) {
-    await trigger({ body: data });
+  function handleLoginSuccess(token: string) {
+    toast.success('Đăng nhập thành công');
+    localStorage.setItem('token', token);
+    router.push('/dashboard/talent');
   }
 
-  useEffect(() => {
-    console.log('🚀 ~ useEffect ~ res:', res);
-    if (!res?.token) return;
+  function handleLoginError() {
+    toast.error('Đăng nhập thất bại');
+  }
 
-    localStorage.setItem('token', res.token);
-    test({});
-  }, [res]);
+  async function handleSubmit(data: AuthSchema) {
+    await trigger({
+      body: data,
+      notifyOnError: false,
+      onSuccess(res) {
+        if (res?.token) {
+          handleLoginSuccess(res.token);
+          return;
+        }
+        handleLoginError();
+      },
+      onError: handleLoginError
+    });
+  }
 
   return (
     <Form {...form}>
@@ -65,6 +72,7 @@ export default function UserAuthForm() {
                 <Input
                   type="text"
                   placeholder="Enter your account"
+                  disabled={loading}
                   {...field}
                 />
               </FormControl>
@@ -82,6 +90,7 @@ export default function UserAuthForm() {
                 <Input
                   type="password"
                   placeholder="Enter your password"
+                  disabled={loading}
                   {...field}
                 />
               </FormControl>

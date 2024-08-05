@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 export interface FetcherParams {
   url?: string;
@@ -8,20 +10,24 @@ export interface FetcherParams {
   headers?: Record<string, any>;
   method?: 'POST' | 'GET' | 'PUT' | 'DELETE';
   withToken?: boolean;
+  triggerOnMount?: boolean;
+  notifyOnError?: boolean;
   onError?: (error: any) => void;
   onSuccess?: (data: any) => void;
   onSettled?: () => void;
 }
 
-// const BASE_API = 'https://phandc-fci-pc.tail58805.ts.net';
-const BASE_API = 'http://10.36.7.9:8000';
+const BASE_API = 'https://phandc-fci-pc.tail58805.ts.net';
+// const BASE_API = 'http://10.36.7.9:8000';
 
-export default function useFetcher(initParams: Readonly<FetcherParams>) {
-  const [loading, setLoading] = useState<boolean>(false);
+export default function useFetcher(initParams: Readonly<FetcherParams> = {}) {
+  let triggeredOnMount = false;
+  const router = useRouter();
+  const [loading, setLoading] = useState<boolean>(!!initParams.triggerOnMount);
   const [data, setData] = useState<any>(null);
   const [error, setError] = useState<any>(null);
 
-  async function fetchData(triggerParams: Readonly<FetcherParams>) {
+  async function trigger(triggerParams: Readonly<FetcherParams> = {}) {
     setLoading(true);
     setError(null);
     setData(null);
@@ -34,6 +40,7 @@ export default function useFetcher(initParams: Readonly<FetcherParams>) {
       headers,
       rawBody,
       withToken,
+      notifyOnError = true,
       onError = () => {},
       onSuccess = () => {},
       onSettled = () => {}
@@ -67,10 +74,15 @@ export default function useFetcher(initParams: Readonly<FetcherParams>) {
 
       setData(data);
       onSuccess(data);
+
       console.info(url, data);
     } catch (error: any) {
       setError(error);
       onError(error);
+
+      if (error.message === '401') router.push('/sign-in');
+      if (notifyOnError) toast.error('Đã xảy ra lỗi');
+
       console.warn(url, error);
     } finally {
       onSettled();
@@ -78,10 +90,19 @@ export default function useFetcher(initParams: Readonly<FetcherParams>) {
     }
   }
 
+  useEffect(() => {
+    if (initParams.triggerOnMount && !triggeredOnMount) trigger();
+
+    return () => {
+      // Avoid effect firing twice in development
+      triggeredOnMount = true;
+    };
+  }, []);
+
   return {
-    loading,
-    error,
     data,
-    trigger: fetchData
+    error,
+    loading,
+    trigger
   };
 }

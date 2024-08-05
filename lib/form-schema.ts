@@ -17,3 +17,10 @@ export const taskSchema = z.object({
 });
 
 export type TaskSchema = z.infer<typeof taskSchema>;
+
+export const authSchema = z.object({
+  username: z.string(),
+  password: z.string()
+});
+
+export type AuthSchema = z.infer<typeof authSchema>;

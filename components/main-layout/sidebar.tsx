@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { DashboardNav } from '@/components/dashboard-nav';
-import { navItems } from '@/constants/data';
+import { navItems } from '@/constants/nav-item';
 import { cn } from '@/lib/utils';
 import { ChevronLeft } from 'lucide-react';
 import { useSidebar } from '@/hooks/useSidebar';
