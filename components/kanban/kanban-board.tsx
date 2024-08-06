@@ -1,7 +1,7 @@
 'use client';
 import { Fragment, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Task, useTaskStore, ColumnId } from '@/lib/store';
+import { Task, useTaskStore, ColumnId } from '@/store/task-store';
 import { hasDraggableData } from '@/lib/utils';
 import {
   Announcements,
@@ -16,13 +16,11 @@ import {
   type DragStartEvent
 } from '@dnd-kit/core';
 import { SortableContext, arrayMove } from '@dnd-kit/sortable';
-import type { Column } from './board-column';
 import { BoardColumn, BoardContainer } from './board-column';
 import { TaskCard } from './task-card';
 
 export function KanbanBoard() {
   const columns = useTaskStore((state) => state.columns);
-  console.log(columns);
   const pickedUpTaskColumn = useRef<ColumnId | null>(null);
   const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
 
@@ -136,7 +134,8 @@ export function KanbanBoard() {
         </SortableContext>
       </BoardContainer>
 
-      {'document' in window &&
+      {typeof window !== 'undefined' &&
+        'document' in window &&
         createPortal(
           <DragOverlay>
             {activeTask && <TaskCard task={activeTask} isOverlay />}

@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { v4 as uuid } from 'uuid';
 import { Column } from '@/components/kanban/board-column';
-import { UniqueIdentifier } from '@dnd-kit/core';
 
 export type Status = 'TODO' | 'IN_PROGRESS' | 'DONE';
 

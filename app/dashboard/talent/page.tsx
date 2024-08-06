@@ -4,7 +4,7 @@ import PageContainer from '@/components/main-layout/page-container';
 import TalentTable from '@/components/tables/talent-tables';
 import { Skeleton } from '@/components/ui/skeleton';
 import useFetcher from '@/lib/fetcher';
-import ENDPOINT from '@/constants/endpoint';
+import { ENDPOINT } from '@/constants/endpoint';
 
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },

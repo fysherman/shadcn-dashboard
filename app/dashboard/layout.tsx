@@ -1,16 +1,15 @@
+'use client';
 import Header from '@/components/main-layout/header';
 import Sidebar from '@/components/main-layout/sidebar';
-import type { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'Talent Hub'
-};
+import useAuth from '@/hooks/useAuth';
 
 export default function DashboardLayout({
   children
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
+  useAuth();
+
   return (
     <div className="flex">
       <Sidebar />

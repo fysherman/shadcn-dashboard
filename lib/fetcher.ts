@@ -1,3 +1,4 @@
+import { BASE_API } from '@/constants/endpoint';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -16,9 +17,6 @@ export interface FetcherParams {
   onSuccess?: (data: any) => void;
   onSettled?: () => void;
 }
-
-const BASE_API = 'https://phandc-fci-pc.tail58805.ts.net';
-// const BASE_API = 'http://10.36.7.9:8000';
 
 export default function useFetcher(initParams: Readonly<FetcherParams> = {}) {
   let triggeredOnMount = false;

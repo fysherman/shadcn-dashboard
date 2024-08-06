@@ -1,4 +1,4 @@
-import { Task } from '@/lib/store';
+import { Task } from '@/store/task-store';
 import { useDndContext, type UniqueIdentifier } from '@dnd-kit/core';
 import { SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -86,7 +86,9 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
   );
 }
 
-export function BoardContainer({ children }: { children: React.ReactNode }) {
+export function BoardContainer({
+  children
+}: Readonly<{ children: React.ReactNode }>) {
   const dndContext = useDndContext();
 
   const variations = cva('px-2  pb-4 md:px-0 flex lg:justify-start', {

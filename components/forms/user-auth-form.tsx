@@ -15,7 +15,7 @@ import { useForm } from 'react-hook-form';
 import { authSchema, AuthSchema } from '@/lib/form-schema';
 import { toast } from 'sonner';
 import useFetcher from '@/lib/fetcher';
-import ENDPOINT from '@/constants/endpoint';
+import { ENDPOINT } from '@/constants/endpoint';
 
 export default function UserAuthForm() {
   const router = useRouter();
