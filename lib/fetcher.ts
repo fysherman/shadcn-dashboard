@@ -12,7 +12,7 @@ export interface FetcherParams {
   method?: 'POST' | 'GET' | 'PUT' | 'DELETE';
   withToken?: boolean;
   triggerOnMount?: boolean;
-  notifyOnError?: boolean;
+  silent?: boolean;
   onError?: (error: any) => void;
   onSuccess?: (data: any) => void;
   onSettled?: () => void;
@@ -38,7 +38,7 @@ export default function useFetcher(initParams: Readonly<FetcherParams> = {}) {
       headers,
       rawBody,
       withToken,
-      notifyOnError = true,
+      silent = false,
       onError = () => {},
       onSuccess = () => {},
       onSettled = () => {}
@@ -79,7 +79,7 @@ export default function useFetcher(initParams: Readonly<FetcherParams> = {}) {
       onError(error);
 
       if (error.message === '401') router.push('/sign-in');
-      if (notifyOnError) toast.error('Đã xảy ra lỗi');
+      if (!silent) toast.error('Đã xảy ra lỗi');
 
       console.warn(url, error);
     } finally {

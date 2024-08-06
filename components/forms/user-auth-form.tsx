@@ -44,7 +44,7 @@ export default function UserAuthForm() {
   async function handleSubmit(data: AuthSchema) {
     await trigger({
       body: data,
-      notifyOnError: false,
+      silent: true,
       onSuccess(res) {
         if (res?.token) {
           handleLoginSuccess(res.token);

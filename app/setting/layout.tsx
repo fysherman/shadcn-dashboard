@@ -1,12 +1,9 @@
+'use client';
 import Header from '@/components/main-layout/header';
-import type { Metadata } from 'next';
 import { Sidebar } from '@/components/setting-layout/sidebar';
 import { Separator } from '@/components/ui/separator';
 import BackButton from '@/components/setting-layout/back-button';
-
-export const metadata: Metadata = {
-  title: 'Talent Hub'
-};
+import useAuth from '@/hooks/useAuth';
 
 const sidebarNavItems = [
   {
@@ -17,9 +14,11 @@ const sidebarNavItems = [
 
 export default function DashboardLayout({
   children
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
+  useAuth();
+
   return (
     <div>
       <Header />

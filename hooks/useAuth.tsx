@@ -11,9 +11,9 @@ export default function useAuth() {
   const { trigger } = useFetcher({
     url: ENDPOINT.ME,
     method: 'GET',
+    silent: true,
     withToken: true,
     onSuccess(data) {
-      console.log(data);
       setUser(data);
     },
     onError() {
@@ -23,7 +23,7 @@ export default function useAuth() {
   });
 
   useLayoutEffect(() => {
-    if (user?.username) return;
+    if (user?.id) return;
 
     trigger();
   }, []);

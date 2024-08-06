@@ -22,10 +22,10 @@ export default function FullCalendar({
   const isMinimized = useSidebar((state) => state.isMinimized);
 
   async function updateSize() {
-    if (!ref.current) return;
-
     // await sidebar finish animate
     await delay(500);
+
+    if (!ref.current) return;
 
     ref.current.getApi().updateSize();
   }
