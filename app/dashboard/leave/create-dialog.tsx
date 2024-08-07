@@ -31,6 +31,8 @@ import { format } from 'date-fns';
 import { Icons } from '@/components/icons';
 import { Calendar } from '@/components/ui/calendar';
 import { useEffect } from 'react';
+import useFetcher from '@/lib/fetcher';
+import { ENDPOINT } from '@/constants/endpoint';
 
 export function CreateDialog({
   open,
@@ -45,15 +47,27 @@ export function CreateDialog({
     resolver: zodResolver(leaveSchema),
     defaultValues: {
       title: '',
-      description: '',
+      desc: '',
       date: new Date()
     }
   });
+  const { trigger, data } = useFetcher({
+    url: ENDPOINT.TICKETS,
+    method: 'POST',
+    onSuccess(data) {
+      toast.success('Tạo ticket thành công');
+      handleOpenChange(false);
+      console.log(data);
+    }
+  });
 
-  function handleSubmit() {
-    toast.success('Gửi thành công');
+  function handleSubmit(data: LeaveSchema) {
+    const { title, desc, date, approved_by } = data;
 
-    handleOpenChange(false);
+    console.log(data);
+    // trigger({
+    //   body: {title, desc, approved_by}
+    // })
   }
 
   function handleOpenChange(state: boolean) {
@@ -131,7 +145,7 @@ export function CreateDialog({
               />
               <FormField
                 control={form.control}
-                name="description"
+                name="desc"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Lí do</FormLabel>

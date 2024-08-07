@@ -12,6 +12,7 @@ export interface NavItem {
   icon?: keyof typeof Icons;
   label?: string;
   description?: string;
+  roles?: Role[];
 }
 
 export interface NavItemWithChildren extends NavItem {
@@ -49,4 +50,4 @@ export type Employee = Partial<
   }>
 >;
 
-export type Role = 'Manager' | 'Mentor' | 'Employee';
+export type Role = 'MANAGER' | 'MENTOR' | 'COLLABRATOR' | 'HR';

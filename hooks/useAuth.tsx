@@ -12,7 +12,6 @@ export default function useAuth() {
     url: ENDPOINT.ME,
     method: 'GET',
     silent: true,
-    withToken: true,
     onSuccess(data) {
       setUser(data);
     },

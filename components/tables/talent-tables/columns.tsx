@@ -2,11 +2,21 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { CellAction } from './cell-action';
 import { Employee } from '@/types';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 export const columns: ColumnDef<Employee>[] = [
   {
-    accessorKey: 'avatar',
-    header: 'Avatar'
+    accessorKey: 'image_profile',
+    header: 'Avatar',
+    cell({ row }) {
+      return (
+        <Avatar className=" h-8 w-8">
+          <AvatarFallback>
+            {row.original?.username?.[0]?.toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
+      );
+    }
   },
   {
     accessorKey: 'fullname',
@@ -21,7 +31,7 @@ export const columns: ColumnDef<Employee>[] = [
     header: 'Birth year'
   },
   {
-    accessorKey: 'location',
+    accessorKey: 'address',
     header: 'Location'
   },
   {

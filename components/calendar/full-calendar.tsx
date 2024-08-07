@@ -6,6 +6,8 @@ import { useSidebar } from '@/hooks/useSidebar';
 import { useEffect, useRef } from 'react';
 import { delay } from '@/lib/utils';
 import { EventClickArg, EventSourceInput } from '@fullcalendar/core/index.js';
+import { useUserStore } from '@/store/user-store';
+import { ROLES } from '@/constants';
 
 export default function FullCalendar({
   events,
@@ -18,6 +20,7 @@ export default function FullCalendar({
   eventClick: (arg: EventClickArg) => void;
   setOpenCreate: (state: boolean) => void;
 }>) {
+  const role = useUserStore((state) => state.role);
   const ref = useRef<Calendar>(null);
   const isMinimized = useSidebar((state) => state.isMinimized);
 
@@ -60,7 +63,10 @@ export default function FullCalendar({
         }
       }}
       headerToolbar={{
-        right: 'today prev,next createButton'
+        right:
+          role === ROLES.COLLABORATOR
+            ? 'today prev,next createButton'
+            : 'today prev,next'
       }}
       events={events}
       eventBackgroundColor="hsl(142.1 76.2% 36.3%)"

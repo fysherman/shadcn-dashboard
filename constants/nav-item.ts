@@ -1,4 +1,5 @@
 import { NavItem } from '@/types';
+import { ROLES } from '@/constants';
 
 export type Employee = {
   id: number;
@@ -24,48 +25,28 @@ export const navItems: NavItem[] = [
     title: 'Quản lí',
     href: '/dashboard/talent',
     icon: 'dashboard',
-    label: 'Talent'
+    label: 'Talent',
+    roles: [ROLES.HR, ROLES.MANAGER, ROLES.MENTOR]
   },
-  // {
-  //   title: 'Dashboard',
-  //   href: '/dashboard',
-  //   icon: 'dashboard',
-  //   label: 'Dashboard'
-  // },
-  // {
-  //   title: 'User',
-  //   href: '/dashboard/user',
-  //   icon: 'user',
-  //   label: 'user'
-  // },
   {
     title: 'Quản lí nghỉ phép',
     href: '/dashboard/leave',
     icon: 'calendar',
-    label: 'leave'
+    label: 'leave',
+    roles: [ROLES.HR, ROLES.MANAGER, ROLES.MENTOR, ROLES.COLLABORATOR]
   },
   {
     title: 'Task',
     href: '/dashboard/task',
     icon: 'kanban',
-    label: 'task'
+    label: 'task',
+    roles: [ROLES.HR, ROLES.MANAGER, ROLES.MENTOR, ROLES.COLLABORATOR]
+  },
+  {
+    title: 'Đề nghị gia hạn hợp đồng',
+    href: '/dashboard/task',
+    icon: 'kanban',
+    label: 'task',
+    roles: [ROLES.HR, ROLES.MANAGER, ROLES.MENTOR, ROLES.COLLABORATOR]
   }
-  // {
-  //   title: 'Profile',
-  //   href: '/dashboard/profile',
-  //   icon: 'profile',
-  //   label: 'profile'
-  // },
-  // {
-  //   title: 'Kanban',
-  //   href: '/dashboard/kanban',
-  //   icon: 'kanban',
-  //   label: 'kanban'
-  // },
-  // {
-  //   title: 'Login',
-  //   href: '/',
-  //   icon: 'login',
-  //   label: 'login'
-  // }
 ];

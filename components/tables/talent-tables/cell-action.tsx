@@ -8,13 +8,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { User } from '@/constants/nav-item';
+import { Employee } from '@/types';
 import { Edit, MoreHorizontal, Trash } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 interface CellActionProps {
-  data: User;
+  data: Employee;
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
@@ -47,9 +47,9 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           >
             <Edit className="mr-2 h-4 w-4" /> Update
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setOpen(true)}>
+          {/* <DropdownMenuItem onClick={() => setOpen(true)}>
             <Trash className="mr-2 h-4 w-4" /> Delete
-          </DropdownMenuItem>
+          </DropdownMenuItem> */}
         </DropdownMenuContent>
       </DropdownMenu>
     </>

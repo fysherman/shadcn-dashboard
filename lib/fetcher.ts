@@ -37,7 +37,7 @@ export default function useFetcher(initParams: Readonly<FetcherParams> = {}) {
       params,
       headers,
       rawBody,
-      withToken,
+      withToken = true,
       silent = false,
       onError = () => {},
       onSuccess = () => {},

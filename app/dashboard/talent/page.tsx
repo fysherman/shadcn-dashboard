@@ -14,16 +14,17 @@ const breadcrumbItems = [
 export default function Page() {
   const { loading, data, error } = useFetcher({
     url: ENDPOINT.EMPLOYEES,
-    withToken: true,
     triggerOnMount: true
   });
+
+  const talents = data?.results ?? [];
 
   return (
     <PageContainer>
       <div className="space-y-2">
         <Breadcrumbs items={breadcrumbItems} />
         {loading && <Skeleton className=" h-60 w-full" />}
-        {!loading && !error && <TalentTable data={data} />}
+        {!loading && !error && <TalentTable data={talents} />}
       </div>
     </PageContainer>
   );

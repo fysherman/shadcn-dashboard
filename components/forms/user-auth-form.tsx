@@ -16,12 +16,18 @@ import { authSchema, AuthSchema } from '@/lib/form-schema';
 import { toast } from 'sonner';
 import useFetcher from '@/lib/fetcher';
 import { ENDPOINT } from '@/constants/endpoint';
+import { ROLES } from '@/constants';
 
 export default function UserAuthForm() {
   const router = useRouter();
   const { trigger, loading } = useFetcher({
     url: ENDPOINT.LOGIN,
-    method: 'POST'
+    method: 'POST',
+    withToken: false
+  });
+  const { trigger: getMe, loading: loadingGetMe } = useFetcher({
+    url: ENDPOINT.ME,
+    method: 'GET'
   });
   const form = useForm<AuthSchema>({
     resolver: zodResolver(authSchema),
@@ -32,9 +38,26 @@ export default function UserAuthForm() {
   });
 
   function handleLoginSuccess(token: string) {
-    toast.success('Đăng nhập thành công');
     localStorage.setItem('token', token);
-    router.push('/dashboard/talent');
+
+    getMe({
+      onSuccess(data) {
+        if (
+          data?.role &&
+          [ROLES.HR, ROLES.MANAGER, ROLES.MENTOR].includes(data.role)
+        ) {
+          router.push('/dashboard/talent');
+          return;
+        }
+        router.push('/dashboard/leave');
+      },
+      onError() {
+        router.push('/dashboard/leave');
+      },
+      onSettled() {
+        toast.success('Đăng nhập thành công');
+      }
+    });
   }
 
   function handleLoginError() {
@@ -72,7 +95,7 @@ export default function UserAuthForm() {
                 <Input
                   type="text"
                   placeholder="Enter your account"
-                  disabled={loading}
+                  disabled={loading || loadingGetMe}
                   {...field}
                 />
               </FormControl>
@@ -90,7 +113,7 @@ export default function UserAuthForm() {
                 <Input
                   type="password"
                   placeholder="Enter your password"
-                  disabled={loading}
+                  disabled={loading || loadingGetMe}
                   {...field}
                 />
               </FormControl>
@@ -99,7 +122,11 @@ export default function UserAuthForm() {
           )}
         />
 
-        <Button className="ml-auto w-full" type="submit" disabled={loading}>
+        <Button
+          className="ml-auto w-full"
+          type="submit"
+          disabled={loading || loadingGetMe}
+        >
           Continue
         </Button>
       </form>

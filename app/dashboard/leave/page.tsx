@@ -8,6 +8,8 @@ import { DateClickArg } from '@fullcalendar/interaction/index.js';
 import { EventImpl } from '@fullcalendar/core/internal';
 import { CreateDialog } from './create-dialog';
 import { DetailDialog } from './detail-dialog';
+import useFetcher from '@/lib/fetcher';
+import { ENDPOINT } from '@/constants/endpoint';
 
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
@@ -15,19 +17,26 @@ const breadcrumbItems = [
 ];
 
 export default function Page() {
+  const { data } = useFetcher({
+    url: ENDPOINT.TICKETS,
+    method: 'GET',
+    triggerOnMount: true
+  });
+  console.log('data', data);
   const [openCreate, setOpenCreate] = useState(false);
   const [openDetail, setOpenDetail] = useState(false);
   const [clickedDate, setClickedDate] = useState<Date>();
   const [clickedEvent, setClickedEvent] = useState<EventImpl>();
-  const events: EventSourceInput = [
-    {
-      id: '1',
-      title: 'Nghỉ phép 34232423432',
-      display: 'block',
-      start: Date.now(),
-      allDay: true
-    }
-  ];
+  // const events: EventSourceInput = [
+  //   {
+  //     id: '1',
+  //     title: 'Nghỉ phép 34232423432',
+  //     display: 'block',
+  //     start: Date.now(),
+  //     allDay: true
+  //   }
+  // ];
+  const events = data?.results ?? [];
 
   function eventClick(arg: EventClickArg) {
     console.log(arg);
