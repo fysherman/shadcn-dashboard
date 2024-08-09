@@ -24,29 +24,29 @@ export const navItems: NavItem[] = [
   {
     title: 'Quản lí',
     href: '/dashboard/talent',
-    icon: 'dashboard',
+    icon: 'Dashboard',
     label: 'Talent',
     roles: [ROLES.HR, ROLES.MANAGER, ROLES.MENTOR]
   },
   {
     title: 'Quản lí nghỉ phép',
     href: '/dashboard/leave',
-    icon: 'calendar',
+    icon: 'Calendar',
     label: 'leave',
     roles: [ROLES.HR, ROLES.MANAGER, ROLES.MENTOR, ROLES.COLLABORATOR]
   },
   {
     title: 'Task',
     href: '/dashboard/task',
-    icon: 'kanban',
+    icon: 'Kanban',
     label: 'task',
     roles: [ROLES.HR, ROLES.MANAGER, ROLES.MENTOR, ROLES.COLLABORATOR]
   },
   {
     title: 'Đề nghị gia hạn hợp đồng',
-    href: '/dashboard/task',
-    icon: 'kanban',
-    label: 'task',
+    href: '/dashboard/contract',
+    icon: 'PenTool',
+    label: 'contract',
     roles: [ROLES.HR, ROLES.MANAGER, ROLES.MENTOR, ROLES.COLLABORATOR]
   }
 ];

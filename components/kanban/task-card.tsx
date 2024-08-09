@@ -1,10 +1,10 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Task } from '@/store/task-store';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { cva } from 'class-variance-authority';
 import { Badge } from '../ui/badge';
 import { Avatar, AvatarFallback } from '../ui/avatar';
+import { Task } from '@/types';
 
 interface TaskCardProps {
   task: Task;
@@ -18,7 +18,7 @@ export interface TaskDragData {
   task: Task;
 }
 
-export function TaskCard({ task, isOverlay }: TaskCardProps) {
+export function TaskCard({ task, isOverlay }: Readonly<TaskCardProps>) {
   const {
     setNodeRef,
     attributes,

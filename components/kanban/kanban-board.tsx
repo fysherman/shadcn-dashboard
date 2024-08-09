@@ -1,15 +1,13 @@
 'use client';
-import { Fragment, useMemo, useRef, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Task, useTaskStore, ColumnId } from '@/store/task-store';
 import { hasDraggableData } from '@/lib/utils';
 import {
-  Announcements,
   DndContext,
+  DragMoveEvent,
   DragOverlay,
   MouseSensor,
   TouchSensor,
-  UniqueIdentifier,
   useSensor,
   useSensors,
   type DragOverEvent,
@@ -18,146 +16,58 @@ import {
 import { SortableContext, arrayMove } from '@dnd-kit/sortable';
 import { BoardColumn, BoardContainer } from './board-column';
 import { TaskCard } from './task-card';
+import useFetcher from '@/lib/fetcher';
+import { ENDPOINT } from '@/constants/endpoint';
+import { Task, TaskStatus } from '@/types';
+import { taskColumns } from '@/constants';
+import { DetailDialog } from './detail-dialog';
 
 export function KanbanBoard() {
-  const columns = useTaskStore((state) => state.columns);
-  const pickedUpTaskColumn = useRef<ColumnId | null>(null);
-  const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
+  const { data, trigger } = useFetcher({
+    url: ENDPOINT.TASKS,
+    method: 'GET',
+    triggerOnMount: true
+  });
+  const tasks: Task[] = data?.results ?? [];
+  // const columns = useTaskStore((state) => state.columns);
+  const columnsId = taskColumns.map((col) => col.id);
 
-  const tasks = useTaskStore((state) => state.tasks);
-  const setTasks = useTaskStore((state) => state.setTasks);
+  // const tasks = useTaskStore((state) => state.tasks);
+  // const setTasks = useTaskStore((state) => state.setTasks);
 
   const [activeTask, setActiveTask] = useState<Task | null>(null);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [openDetail, setOpenDetail] = useState<boolean>(false);
 
   const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
 
-  function getDraggingTaskData(taskId: UniqueIdentifier, columnId: ColumnId) {
-    const tasksInColumn = tasks.filter((task) => task.status === columnId);
-    const taskPosition = tasksInColumn.findIndex((task) => task.id === taskId);
-    const column = columns.find((col) => col.id === columnId);
-    return {
-      tasksInColumn,
-      taskPosition,
-      column
-    };
-  }
-
-  const announcements: Announcements = {
-    onDragStart({ active }) {
-      if (!hasDraggableData(active)) return;
-
-      if (active.data.current?.type === 'Task') {
-        pickedUpTaskColumn.current = active.data.current.task.status;
-        const { tasksInColumn, taskPosition, column } = getDraggingTaskData(
-          active.id,
-          pickedUpTaskColumn.current
-        );
-        return `Picked up Task ${active.data.current.task.title} at position: ${
-          taskPosition + 1
-        } of ${tasksInColumn.length} in column ${column?.title}`;
-      }
-    },
-    onDragOver({ active, over }) {
-      if (!hasDraggableData(active) || !hasDraggableData(over)) return;
-
-      if (
-        active.data.current?.type === 'Task' &&
-        over.data.current?.type === 'Task'
-      ) {
-        const { tasksInColumn, taskPosition, column } = getDraggingTaskData(
-          over.id,
-          over.data.current.task.status
-        );
-        if (over.data.current.task.status !== pickedUpTaskColumn.current) {
-          return `Task ${
-            active.data.current.task.title
-          } was moved over column ${column?.title} in position ${
-            taskPosition + 1
-          } of ${tasksInColumn.length}`;
-        }
-        return `Task was moved over position ${taskPosition + 1} of ${
-          tasksInColumn.length
-        } in column ${column?.title}`;
-      }
-    },
-    onDragEnd({ active, over }) {
-      if (!hasDraggableData(active) || !hasDraggableData(over)) {
-        pickedUpTaskColumn.current = null;
-        return;
-      }
-      if (
-        active.data.current?.type === 'Task' &&
-        over.data.current?.type === 'Task'
-      ) {
-        const { tasksInColumn, taskPosition, column } = getDraggingTaskData(
-          over.id,
-          over.data.current.task.status
-        );
-        if (over.data.current.task.status !== pickedUpTaskColumn.current) {
-          return `Task was dropped into column ${column?.title} in position ${
-            taskPosition + 1
-          } of ${tasksInColumn.length}`;
-        }
-        return `Task was dropped into position ${taskPosition + 1} of ${
-          tasksInColumn.length
-        } in column ${column?.title}`;
-      }
-      pickedUpTaskColumn.current = null;
-    },
-    onDragCancel({ active }) {
-      pickedUpTaskColumn.current = null;
-      if (!hasDraggableData(active)) return;
-      return `Dragging ${active.data.current?.type} cancelled.`;
-    }
-  };
-
-  return (
-    <DndContext
-      accessibility={{
-        announcements
-      }}
-      sensors={sensors}
-      onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
-      onDragOver={onDragOver}
-    >
-      <BoardContainer>
-        <SortableContext items={columnsId}>
-          {columns?.map((col) => (
-            <Fragment key={col.id}>
-              <BoardColumn
-                column={col}
-                tasks={tasks.filter((task) => task.status === col.id)}
-              />
-            </Fragment>
-          ))}
-        </SortableContext>
-      </BoardContainer>
-
-      {typeof window !== 'undefined' &&
-        'document' in window &&
-        createPortal(
-          <DragOverlay>
-            {activeTask && <TaskCard task={activeTask} isOverlay />}
-          </DragOverlay>,
-          document.body
-        )}
-    </DndContext>
-  );
-
   function onDragStart(event: DragStartEvent) {
+    console.log('start');
     if (!hasDraggableData(event.active)) return;
 
     const data = event.active.data.current;
 
     if (data?.type === 'Task') {
       setActiveTask(data.task);
-      return;
     }
   }
 
+  function onDragMove(event: DragMoveEvent) {
+    if (!hasDraggableData(event.active)) return;
+
+    console.log('move');
+    setIsDragging(true);
+  }
+
   function onDragEnd() {
+    if (!isDragging) {
+      setOpenDetail(true);
+      setIsDragging(false);
+      return;
+    }
+
     setActiveTask(null);
+    setIsDragging(false);
   }
 
   function onDragOver(event: DragOverEvent) {
@@ -187,10 +97,10 @@ export function KanbanBoard() {
       const overTask = tasks[overIndex];
       if (activeTask && overTask && activeTask.status !== overTask.status) {
         activeTask.status = overTask.status;
-        setTasks(arrayMove(tasks, activeIndex, overIndex - 1));
+        // setTasks(arrayMove(tasks, activeIndex, overIndex - 1));
       }
 
-      setTasks(arrayMove(tasks, activeIndex, overIndex));
+      // setTasks(arrayMove(tasks, activeIndex, overIndex));
     }
 
     const isOverAColumn = overData?.type === 'Column';
@@ -200,9 +110,54 @@ export function KanbanBoard() {
       const activeIndex = tasks.findIndex((t) => t.id === activeId);
       const activeTask = tasks[activeIndex];
       if (activeTask) {
-        activeTask.status = overId as ColumnId;
-        setTasks(arrayMove(tasks, activeIndex, activeIndex));
+        activeTask.status = overId as TaskStatus;
+        // setTasks(arrayMove(tasks, activeIndex, activeIndex));
       }
     }
   }
+
+  useEffect(() => {
+    // Clear active task on close detail dialog
+    if (!openDetail) setActiveTask(null);
+  }, [openDetail]);
+
+  return (
+    <>
+      <DndContext
+        sensors={sensors}
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
+        onDragOver={onDragOver}
+        onDragMove={onDragMove}
+      >
+        <BoardContainer>
+          <SortableContext items={columnsId}>
+            {taskColumns?.map((col) => (
+              <Fragment key={col.id}>
+                <BoardColumn
+                  column={col}
+                  tasks={tasks.filter((task) => task.status === col.id)}
+                />
+              </Fragment>
+            ))}
+          </SortableContext>
+        </BoardContainer>
+
+        {typeof window !== 'undefined' &&
+          'document' in window &&
+          createPortal(
+            <DragOverlay>
+              {activeTask && <TaskCard task={activeTask} isOverlay />}
+            </DragOverlay>,
+            document.body
+          )}
+      </DndContext>
+      <DetailDialog
+        open={openDetail}
+        task={activeTask}
+        setOpen={setOpenDetail}
+        reloadKanban={trigger}
+      />
+    </>
+  );
 }

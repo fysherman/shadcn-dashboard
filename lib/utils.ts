@@ -33,3 +33,7 @@ export function delay(time: number = 0): Promise<undefined> {
     setTimeout(res, time);
   });
 }
+
+export function upperCaseFirstLetter(string?: string | null) {
+  return (string ?? '')[0]?.toUpperCase() ?? '';
+}

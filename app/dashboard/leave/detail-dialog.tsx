@@ -10,20 +10,59 @@ import {
 import { toast } from 'sonner';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Leave } from '@/types';
+import { format } from 'date-fns';
+import { useUserStore } from '@/store/user-store';
+import { Badge } from '@/components/ui/badge';
+import useFetcher from '@/lib/fetcher';
+import { ENDPOINT } from '@/constants/endpoint';
+import { upperCaseFirstLetter } from '@/lib/utils';
 
 export function DetailDialog({
   open,
-  setOpen
+  event,
+  setOpen,
+  reloadCalendar
 }: Readonly<{
   open: boolean;
+  event?: Leave;
   setOpen: (state: boolean) => void;
+  reloadCalendar: () => void;
 }>) {
+  const user = useUserStore((state) => state.user);
+  const { trigger } = useFetcher({
+    url: `${ENDPOINT.TICKETS}${event?.id}/`,
+    method: 'PUT',
+    onSuccess() {
+      toast.success('Gửi thành công');
+      reloadCalendar();
+      handleOpenChange(false);
+    }
+  });
+  const submitterName = event?.submitted_by_name ?? '';
+  const approverName = event?.approved_by_name ?? '';
+  const isApprover = user?.id === event?.approved_by;
+  let statusVariant: 'default' | 'secondary' | 'destructive' = 'secondary';
+
+  switch (event?.status) {
+    case 'APPROVED':
+      statusVariant = 'default';
+      break;
+    case 'REJECTED':
+      statusVariant = 'destructive';
+      break;
+    default:
+      break;
+  }
+
   function handleOpenChange(state: boolean) {
     setOpen(state);
   }
 
-  function submitRequest() {
-    toast.success('Gửi thành công');
+  function submitRequest(status: Leave['status']) {
+    trigger({
+      body: { status }
+    });
   }
 
   return (
@@ -34,45 +73,59 @@ export function DetailDialog({
           <DialogDescription>Chi tiết đơn xin nghỉ phép</DialogDescription>
         </DialogHeader>
         <div className=" space-y-4 py-4">
+          <Badge variant={statusVariant}>{event?.status}</Badge>
           <div className=" grid grid-cols-4 items-center gap-4">
             <Label>Người gửi</Label>
             <div className=" col-span-3 flex items-center space-x-4">
               <Avatar className=" h-8 w-8">
-                <AvatarFallback>{'A'}</AvatarFallback>
+                <AvatarFallback>
+                  {upperCaseFirstLetter(submitterName)}
+                </AvatarFallback>
               </Avatar>
-              <p>khanhbd4</p>
+              <p>{submitterName}</p>
+            </div>
+          </div>
+          <div className=" grid grid-cols-4 items-center gap-4">
+            <Label>Người duyệt</Label>
+            <div className=" col-span-3 flex items-center space-x-4">
+              <Avatar className=" h-8 w-8">
+                <AvatarFallback>
+                  {upperCaseFirstLetter(approverName)}
+                </AvatarFallback>
+              </Avatar>
+              <p>{approverName}</p>
             </div>
           </div>
           <div className=" grid grid-cols-4 items-center gap-4">
             <Label>Thời gian</Label>
-            <p className=" col-span-3">1/9/2024</p>
+            <p className=" col-span-3">
+              {event?.from_date &&
+                format(new Date(event?.from_date), 'yyyy-MM-dd')}
+            </p>
           </div>
           <div className=" grid grid-cols-4 items-center gap-4">
             <Label>Tiêu đề</Label>
-            <p className=" col-span-3">Xin nghỉ phép</p>
+            <p className=" col-span-3">{event?.title}</p>
           </div>
           <div className=" grid grid-cols-4 items-center gap-4">
             <Label>Lí do</Label>
-            <p className=" col-span-3">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Voluptatem ab dolores consectetur animi at, obcaecati ipsum nobis
-              officiis molestiae necessitatibus aspernatur amet! Quos, minus
-              pariatur. Possimus aliquid esse alias unde!
-            </p>
+            <p className=" col-span-3">{event?.desc}</p>
           </div>
         </div>
-        <DialogFooter>
-          <Button
-            variant="secondary"
-            type="button"
-            onClick={() => submitRequest()}
-          >
-            Từ chối
-          </Button>
-          <Button type="button" onClick={() => submitRequest()}>
-            Duyệt
-          </Button>
-        </DialogFooter>
+        {isApprover && event?.status === 'PENDING' && (
+          <DialogFooter>
+            <Button
+              variant="secondary"
+              type="button"
+              onClick={() => submitRequest('REJECTED')}
+            >
+              Từ chối
+            </Button>
+            <Button type="button" onClick={() => submitRequest('APPROVED')}>
+              Duyệt
+            </Button>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   );

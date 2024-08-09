@@ -26,7 +26,7 @@ export function DashboardNav({
   items,
   setOpen,
   isMobileNav = false
-}: DashboardNavProps) {
+}: Readonly<DashboardNavProps>) {
   const path = usePathname();
   const { isMinimized } = useSidebar();
   const role = useUserStore((state) => state.role);
@@ -37,10 +37,10 @@ export function DashboardNav({
         {items
           .filter((item) => !item.roles || (role && item.roles.includes(role)))
           .map((item, index) => {
-            const Icon = Icons[item.icon || 'arrowRight'];
+            const Icon = Icons[item.icon ?? 'ArrowRight'];
             return (
               item.href && (
-                <Tooltip key={index}>
+                <Tooltip key={`${index}/${item.href}`}>
                   <TooltipTrigger asChild>
                     <Link
                       href={item.disabled ? '/' : item.href}

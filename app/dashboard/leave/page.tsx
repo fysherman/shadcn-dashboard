@@ -2,14 +2,14 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import FullCalendar from '@/components/calendar/full-calendar';
 import PageContainer from '@/components/main-layout/page-container';
-import { useState } from 'react';
-import { EventClickArg, EventSourceInput } from '@fullcalendar/core/index.js';
+import { useMemo, useState } from 'react';
+import { EventClickArg, EventInput } from '@fullcalendar/core/index.js';
 import { DateClickArg } from '@fullcalendar/interaction/index.js';
-import { EventImpl } from '@fullcalendar/core/internal';
 import { CreateDialog } from './create-dialog';
 import { DetailDialog } from './detail-dialog';
 import useFetcher from '@/lib/fetcher';
 import { ENDPOINT } from '@/constants/endpoint';
+import { Leave } from '@/types';
 
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
@@ -17,35 +17,88 @@ const breadcrumbItems = [
 ];
 
 export default function Page() {
-  const { data } = useFetcher({
+  const { data, trigger } = useFetcher({
     url: ENDPOINT.TICKETS,
     method: 'GET',
     triggerOnMount: true
   });
-  console.log('data', data);
   const [openCreate, setOpenCreate] = useState(false);
   const [openDetail, setOpenDetail] = useState(false);
   const [clickedDate, setClickedDate] = useState<Date>();
-  const [clickedEvent, setClickedEvent] = useState<EventImpl>();
-  // const events: EventSourceInput = [
-  //   {
-  //     id: '1',
-  //     title: 'Nghỉ phép 34232423432',
-  //     display: 'block',
-  //     start: Date.now(),
-  //     allDay: true
-  //   }
-  // ];
-  const events = data?.results ?? [];
+  const [clickedEvent, setClickedEvent] = useState<Leave>();
+
+  const eventColorMapping: Record<
+    NonNullable<Leave['status']>,
+    { text: string; background: string }
+  > = {
+    PENDING: {
+      text: 'hsl(var(--secondary-foreground))',
+      background: 'hsl(var(--secondary))'
+    },
+    APPROVED: {
+      text: 'hsl(var(--primary-foreground))',
+      background: 'hsl(var(--primary))'
+    },
+    REJECTED: {
+      text: 'hsl(var(--destructive-foreground))',
+      background: 'hsl(var(--destructive))'
+    }
+  };
+
+  const events = useMemo(() => {
+    const results: Leave[] = data?.results ?? [];
+
+    return results
+      .map<EventInput | undefined>((item) => {
+        if (!item) return undefined;
+
+        const {
+          id,
+          title,
+          status,
+          from_date,
+          to_date,
+          approved_by,
+          submitted_by,
+          submitted_by_name
+        } = item;
+
+        if (
+          [
+            id,
+            title,
+            status,
+            from_date,
+            to_date,
+            approved_by,
+            submitted_by
+          ].some((value) => value === null || value === undefined)
+        )
+          return undefined;
+
+        const colorMapping =
+          eventColorMapping[status as NonNullable<Leave['status']>];
+
+        return {
+          id: id?.toString(),
+          title: `${title} - ${submitted_by_name}`,
+          start: new Date(from_date as string),
+          allDay: true,
+          extendedProps: item,
+          backgroundColor: colorMapping.background,
+          borderColor: colorMapping.background,
+          textColor: colorMapping.text
+        };
+      })
+      .filter((item) => item !== undefined);
+  }, [data]);
 
   function eventClick(arg: EventClickArg) {
-    console.log(arg);
-    setClickedEvent(arg.event);
+    setClickedEvent(arg.event.extendedProps as Leave);
     setOpenDetail(true);
   }
 
   function dateClick(arg?: DateClickArg) {
-    console.log(arg);
     setClickedDate(arg?.date);
   }
 
@@ -63,8 +116,14 @@ export default function Page() {
           open={openCreate}
           clickedDate={clickedDate}
           setOpen={setOpenCreate}
+          reloadCalendar={trigger}
         />
-        <DetailDialog open={openDetail} setOpen={setOpenDetail} />
+        <DetailDialog
+          open={openDetail}
+          event={clickedEvent}
+          setOpen={setOpenDetail}
+          reloadCalendar={trigger}
+        />
       </div>
     </PageContainer>
   );

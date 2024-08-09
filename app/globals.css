@@ -61,13 +61,13 @@
 
 /* Full calendar custom */
 :root {
-  --fc-button-text-color: hsl(355.7 100% 97.3%);
-  --fc-button-bg-color: hsl(142.1 76.2% 36.3%);
-  --fc-button-border-color: hsl(142.1 76.2% 36.3%);
-  --fc-button-hover-bg-color: hsl(142.1 76.2% 36.3% / 0.9);
-  --fc-button-hover-border-color: hsl(142.1 76.2% 36.3% / 0.9);
-  --fc-button-active-bg-color: hsl(142.1 76.2% 36.3% / 0.9);
-  --fc-button-active-border-color: hsl(142.1 76.2% 36.3% / 0.9);
+  --fc-button-text-color: hsl(var(--primary-foreground));
+  --fc-button-bg-color: hsl(var(--primary));
+  --fc-button-border-color: hsl(var(--primary));
+  --fc-button-hover-bg-color: hsl(var(--primary) / 0.9);
+  --fc-button-hover-border-color: hsl(var(--primary) / 0.9);
+  --fc-button-active-bg-color: hsl(var(--primary) / 0.9);
+  --fc-button-active-border-color: hsl(var(--primary) / 0.9);
 }
 
 .fc .fc-button:focus,
@@ -77,13 +77,13 @@
 .fc .fc-today-button,
 .fc .fc-prev-button,
 .fc .fc-next-button {
-  --fc-button-text-color: hsl(240 5.9% 10%);
-  --fc-button-bg-color: hsl(240 4.8% 95.9%);
-  --fc-button-border-color: hsl(240 4.8% 95.9%);
-  --fc-button-hover-bg-color: hsl(240 4.8% 95.9% / 0.9);
-  --fc-button-hover-border-color: hsl(240 4.8% 95.9% / 0.9);
-  --fc-button-active-bg-color: hsl(240 4.8% 95.9% / 0.9);
-  --fc-button-active-border-color: hsl(240 4.8% 95.9% / 0.9);
+  --fc-button-text-color: hsl(var(--secondary-foreground));
+  --fc-button-bg-color: hsl(var(--secondary));
+  --fc-button-border-color: hsl(var(--secondary));
+  --fc-button-hover-bg-color: hsl(var(--secondary) / 0.9);
+  --fc-button-hover-border-color: hsl(var(--secondary) / 0.9);
+  --fc-button-active-bg-color: hsl(var(--secondary) / 0.9);
+  --fc-button-active-border-color: hsl(var(--secondary) / 0.9);
 }
 .fc .fc-button {
   border-radius: calc(var(--radius) - 2px);

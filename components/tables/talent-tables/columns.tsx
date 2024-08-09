@@ -3,6 +3,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { CellAction } from './cell-action';
 import { Employee } from '@/types';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { upperCaseFirstLetter } from '@/lib/utils';
 
 export const columns: ColumnDef<Employee>[] = [
   {
@@ -12,7 +13,7 @@ export const columns: ColumnDef<Employee>[] = [
       return (
         <Avatar className=" h-8 w-8">
           <AvatarFallback>
-            {row.original?.username?.[0]?.toUpperCase()}
+            {upperCaseFirstLetter(row.original?.username)}
           </AvatarFallback>
         </Avatar>
       );
@@ -45,9 +46,9 @@ export const columns: ColumnDef<Employee>[] = [
   {
     accessorKey: 'join',
     header: 'Joined from'
-  },
-  {
-    id: 'actions',
-    cell: ({ row }) => <CellAction data={row.original} />
   }
+  // {
+  //   id: 'actions',
+  //   cell: ({ row }) => <CellAction data={row.original} />
+  // }
 ];

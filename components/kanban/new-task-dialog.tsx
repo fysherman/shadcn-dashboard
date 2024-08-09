@@ -23,37 +23,70 @@ import { Textarea } from '../ui/textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { TaskSchema, taskSchema } from '@/lib/form-schema';
 import { useForm } from 'react-hook-form';
-import { Popover, PopoverContent } from '../ui/popover';
-import { PopoverTrigger } from '@radix-ui/react-popover';
-import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
-import { Icons } from '../icons';
-import { Calendar } from '../ui/calendar';
+// import { Popover, PopoverContent } from '../ui/popover';
+// import { PopoverTrigger } from '@radix-ui/react-popover';
+// import { cn } from '@/lib/utils';
+// import { format } from 'date-fns';
+// import { Icons } from '../icons';
+// import { Calendar } from '../ui/calendar';
 import { toast } from 'sonner';
 import { useEffect, useState } from 'react';
+import useFetcher from '@/lib/fetcher';
+import { ENDPOINT } from '@/constants/endpoint';
+import { useUserStore } from '@/store/user-store';
+import { ROLES } from '@/constants';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
+import { Employee } from '@/types';
 
 export default function NewTaskDialog() {
+  const { trigger, loading } = useFetcher({
+    url: ENDPOINT.TASKS,
+    method: 'POST',
+    onSuccess() {
+      toast.success('Tạo task thành công');
+      setOpen(false);
+    }
+  });
+  const { data: employees } = useFetcher({
+    url: ENDPOINT.EMPLOYEES,
+    method: 'GET',
+    silent: true,
+    triggerOnMount: true
+  });
+  const role = useUserStore((state) => state.role);
   const form = useForm<TaskSchema>({
     resolver: zodResolver(taskSchema),
     defaultValues: {
       title: '',
-      description: '',
-      startDate: new Date(),
-      endDate: new Date(),
-      assigner: ''
+      desc: ''
     }
   });
   const [open, setOpen] = useState(false);
+  const assigneeList: Employee[] = employees?.results ?? [];
 
-  function handleSubmit() {
-    toast.success('Tạo task thành công');
-
-    setOpen(false);
+  function handleSubmit(data: TaskSchema) {
+    trigger({
+      body: {
+        ...data,
+        assignee: Number(data.assignee)
+      }
+    });
   }
 
   useEffect(() => {
     if (!open) form.reset();
   }, [open]);
+
+  if (!role || ![ROLES.HR, ROLES.MANAGER, ROLES.MENTOR].includes(role))
+    return null;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -63,7 +96,7 @@ export default function NewTaskDialog() {
       <DialogContent className=" max-w-2xl">
         <DialogHeader>
           <DialogTitle>Tạo task</DialogTitle>
-          <DialogDescription>Task công việc</DialogDescription>
+          <DialogDescription>Tạo task công việc</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -71,82 +104,116 @@ export default function NewTaskDialog() {
             className=" space-y-4 py-4"
             onSubmit={form.handleSubmit(handleSubmit)}
           >
-            <FormField
-              control={form.control}
-              name="startDate"
-              render={({ field }) => (
-                <FormItem className=" flex flex-col">
-                  <FormLabel>Start date</FormLabel>
-                  <Popover modal>
-                    <PopoverTrigger asChild>
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="assignee"
+                render={({ field }) => (
+                  <FormItem className=" col-span-1 flex flex-col">
+                    <FormLabel>Assignee</FormLabel>
+                    <Select onValueChange={field.onChange} disabled={loading}>
                       <FormControl>
-                        <Button
-                          variant={'outline'}
-                          className={cn(
-                            'w-[240px] pl-3 text-left font-normal',
-                            !field.value && 'text-muted-foreground'
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, 'PPP')
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                          <Icons.calendar className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select a employee" />
+                        </SelectTrigger>
                       </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="endDate"
-              render={({ field }) => (
-                <FormItem className=" flex flex-col">
-                  <FormLabel>End date</FormLabel>
-                  <Popover modal>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={'outline'}
-                          className={cn(
-                            'w-[240px] pl-3 text-left font-normal',
-                            !field.value && 'text-muted-foreground'
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, 'PPP')
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                          <Icons.calendar className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>TTS / Cộng tác viên</SelectLabel>
+                          {assigneeList.map((employee) => (
+                            <SelectItem
+                              key={employee?.id}
+                              value={employee?.id?.toString() ?? ''}
+                            >
+                              {employee?.username} - {employee?.fullname}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            {/* <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="startDate"
+                render={({ field }) => (
+                  <FormItem className=" flex flex-col">
+                    <FormLabel>Start date</FormLabel>
+                    <Popover modal>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={'outline'}
+                            className={cn(
+                              'w-full pl-3 text-left font-normal',
+                              !field.value && 'text-muted-foreground'
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, 'PPP')
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <Icons.Calendar className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="endDate"
+                render={({ field }) => (
+                  <FormItem className=" flex flex-col">
+                    <FormLabel>End date</FormLabel>
+                    <Popover modal>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={'outline'}
+                            className={cn(
+                              'w-full pl-3 text-left font-normal',
+                              !field.value && 'text-muted-foreground'
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, 'PPP')
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <Icons.Calendar className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div> */}
             <FormField
               control={form.control}
               name="title"
@@ -154,7 +221,7 @@ export default function NewTaskDialog() {
                 <FormItem>
                   <FormLabel>Tiêu đề</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} disabled={loading} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -162,12 +229,12 @@ export default function NewTaskDialog() {
             />
             <FormField
               control={form.control}
-              name="description"
+              name="desc"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Mô tả</FormLabel>
                   <FormControl>
-                    <Textarea {...field} />
+                    <Textarea {...field} rows={5} disabled={loading} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

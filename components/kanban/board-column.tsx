@@ -1,4 +1,3 @@
-import { Task } from '@/store/task-store';
 import { useDndContext, type UniqueIdentifier } from '@dnd-kit/core';
 import { SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -7,6 +6,7 @@ import { useMemo } from 'react';
 import { Card, CardContent, CardHeader } from '../ui/card';
 import { TaskCard } from './task-card';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { Task } from '@/types';
 
 export interface Column {
   id: UniqueIdentifier;
@@ -26,7 +26,11 @@ interface BoardColumnProps {
   isOverlay?: boolean;
 }
 
-export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
+export function BoardColumn({
+  column,
+  tasks,
+  isOverlay
+}: Readonly<BoardColumnProps>) {
   const tasksIds = useMemo(() => {
     return tasks.map((task) => task.id);
   }, [tasks]);

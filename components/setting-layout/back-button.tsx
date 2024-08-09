@@ -12,7 +12,7 @@ export default function BackButton() {
       size="icon"
       onClick={() => router.push('/dashboard/talent')}
     >
-      <Icons.chevronLeft className=" h-8 w-8" />
+      <Icons.ChevronLeft className=" h-8 w-8" />
     </Button>
   );
 }

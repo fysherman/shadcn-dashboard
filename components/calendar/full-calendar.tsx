@@ -69,8 +69,6 @@ export default function FullCalendar({
             : 'today prev,next'
       }}
       events={events}
-      eventBackgroundColor="hsl(142.1 76.2% 36.3%)"
-      eventBorderColor="hsl(142.1 76.2% 36.3%)"
       eventClassNames=" cursor-pointer"
       eventClick={eventClick}
       dateClick={handleDateClick}

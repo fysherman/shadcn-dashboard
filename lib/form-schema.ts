@@ -1,20 +1,17 @@
 import * as z from 'zod';
 
 export const leaveSchema = z.object({
-  title: z.string(),
-  desc: z.string(),
-  date: z.date(),
-  approved_by: z.string()
+  title: z.string().min(1),
+  desc: z.string().min(1),
+  date: z.date()
 });
 
 export type LeaveSchema = z.infer<typeof leaveSchema>;
 
 export const taskSchema = z.object({
-  title: z.string(),
-  description: z.string(),
-  startDate: z.date(),
-  endDate: z.date(),
-  assigner: z.string()
+  title: z.string().min(1),
+  desc: z.string().min(1),
+  assignee: z.string()
 });
 
 export type TaskSchema = z.infer<typeof taskSchema>;

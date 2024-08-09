@@ -26,23 +26,29 @@ import {
   PopoverContent,
   PopoverTrigger
 } from '@/components/ui/popover';
-import { cn } from '@/lib/utils';
+import { cn, upperCaseFirstLetter } from '@/lib/utils';
 import { format } from 'date-fns';
 import { Icons } from '@/components/icons';
 import { Calendar } from '@/components/ui/calendar';
 import { useEffect } from 'react';
 import useFetcher from '@/lib/fetcher';
 import { ENDPOINT } from '@/constants/endpoint';
+import { useUserStore } from '@/store/user-store';
+import { Label } from '@/components/ui/label';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 export function CreateDialog({
   open,
   clickedDate,
-  setOpen
+  setOpen,
+  reloadCalendar
 }: Readonly<{
   open: boolean;
   clickedDate?: Date;
   setOpen: (state: boolean) => void;
+  reloadCalendar: () => void;
 }>) {
+  const user = useUserStore((state) => state.user);
   const form = useForm<LeaveSchema>({
     resolver: zodResolver(leaveSchema),
     defaultValues: {
@@ -51,23 +57,30 @@ export function CreateDialog({
       date: new Date()
     }
   });
-  const { trigger, data } = useFetcher({
+  const { trigger, loading } = useFetcher({
     url: ENDPOINT.TICKETS,
     method: 'POST',
-    onSuccess(data) {
+    onSuccess() {
       toast.success('Tạo ticket thành công');
+      reloadCalendar();
       handleOpenChange(false);
-      console.log(data);
     }
   });
+  const managerName = user?.manager_name ?? 'Unknown';
 
   function handleSubmit(data: LeaveSchema) {
-    const { title, desc, date, approved_by } = data;
+    const { title, desc, date } = data;
+    const formattedString = format(date, 'yyyy-MM-dd');
 
-    console.log(data);
-    // trigger({
-    //   body: {title, desc, approved_by}
-    // })
+    trigger({
+      body: {
+        title,
+        desc,
+        approved_by: user?.manager,
+        from_date: `${formattedString} 00:00`,
+        to_date: `${formattedString} 11:59`
+      }
+    });
   }
 
   function handleOpenChange(state: boolean) {
@@ -92,6 +105,17 @@ export function CreateDialog({
               <DialogDescription>Tạo đơn xin nghỉ phép</DialogDescription>
             </DialogHeader>
             <div className=" space-y-4 py-4">
+              <div className=" space-y-2">
+                <Label>Người duyệt</Label>
+                <div className=" flex items-center space-x-2">
+                  <Avatar className=" h-8 w-8">
+                    <AvatarFallback>
+                      {upperCaseFirstLetter(managerName)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <p>{managerName}</p>
+                </div>
+              </div>
               <FormField
                 control={form.control}
                 name="date"
@@ -107,13 +131,14 @@ export function CreateDialog({
                               'w-[240px] pl-3 text-left font-normal',
                               !field.value && 'text-muted-foreground'
                             )}
+                            disabled={loading}
                           >
                             {field.value ? (
                               format(field.value, 'PPP')
                             ) : (
                               <span>Pick a date</span>
                             )}
-                            <Icons.calendar className="ml-auto h-4 w-4 opacity-50" />
+                            <Icons.Calendar className="ml-auto h-4 w-4 opacity-50" />
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
@@ -137,7 +162,7 @@ export function CreateDialog({
                   <FormItem>
                     <FormLabel>Tiêu đề</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input {...field} disabled={loading} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -150,7 +175,7 @@ export function CreateDialog({
                   <FormItem>
                     <FormLabel>Lí do</FormLabel>
                     <FormControl>
-                      <Textarea {...field} />
+                      <Textarea {...field} disabled={loading} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -158,7 +183,9 @@ export function CreateDialog({
               />
             </div>
             <DialogFooter>
-              <Button type="submit">Gửi</Button>
+              <Button type="submit" disabled={loading}>
+                Gửi
+              </Button>
             </DialogFooter>
           </form>
         </Form>

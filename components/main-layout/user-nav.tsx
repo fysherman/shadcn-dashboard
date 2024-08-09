@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useRouter } from 'next/navigation';
 import { useUserStore } from '@/store/user-store';
+import { upperCaseFirstLetter } from '@/lib/utils';
 
 export function UserNav() {
   const router = useRouter();
@@ -36,7 +37,7 @@ export function UserNav() {
                 alt={user?.username ?? ''}
               />
               <AvatarFallback>
-                {user?.username?.[0]?.toUpperCase() ?? ''}
+                {upperCaseFirstLetter(user?.username)}
               </AvatarFallback>
             </Avatar>
           </Button>
