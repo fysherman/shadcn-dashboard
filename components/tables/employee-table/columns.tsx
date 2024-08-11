@@ -2,8 +2,9 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { CellAction } from './cell-action';
 import { Employee } from '@/types';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { upperCaseFirstLetter } from '@/lib/utils';
+import Link from 'next/link';
 
 export const columns: ColumnDef<Employee>[] = [
   {
@@ -12,6 +13,10 @@ export const columns: ColumnDef<Employee>[] = [
     cell({ row }) {
       return (
         <Avatar className=" h-8 w-8">
+          <AvatarImage
+            src={row.original?.image_profile ?? undefined}
+            alt={row.original?.username ?? undefined}
+          />
           <AvatarFallback>
             {upperCaseFirstLetter(row.original?.username)}
           </AvatarFallback>
@@ -25,7 +30,17 @@ export const columns: ColumnDef<Employee>[] = [
   },
   {
     accessorKey: 'username',
-    header: 'Account'
+    header: 'Account',
+    cell({ row }) {
+      return (
+        <Link
+          href={`/dashboard/employee/${row.original?.id}`}
+          className=" text-blue-500"
+        >
+          {row.original?.username}
+        </Link>
+      );
+    }
   },
   {
     accessorKey: 'birth_year',
@@ -46,9 +61,9 @@ export const columns: ColumnDef<Employee>[] = [
   {
     accessorKey: 'join',
     header: 'Joined from'
+  },
+  {
+    id: 'actions',
+    cell: ({ row }) => <CellAction data={row.original} />
   }
-  // {
-  //   id: 'actions',
-  //   cell: ({ row }) => <CellAction data={row.original} />
-  // }
 ];

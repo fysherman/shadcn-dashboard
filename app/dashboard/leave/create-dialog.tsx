@@ -28,7 +28,7 @@ import {
 } from '@/components/ui/popover';
 import { cn, upperCaseFirstLetter } from '@/lib/utils';
 import { format } from 'date-fns';
-import { Icons } from '@/components/icons';
+import { Calendar as CalendarIcon } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { useEffect } from 'react';
 import useFetcher from '@/lib/fetcher';
@@ -57,7 +57,7 @@ export function CreateDialog({
       date: new Date()
     }
   });
-  const { trigger, loading } = useFetcher({
+  const fetcher = useFetcher({
     url: ENDPOINT.TICKETS,
     method: 'POST',
     onSuccess() {
@@ -72,7 +72,7 @@ export function CreateDialog({
     const { title, desc, date } = data;
     const formattedString = format(date, 'yyyy-MM-dd');
 
-    trigger({
+    fetcher.trigger({
       body: {
         title,
         desc,
@@ -131,14 +131,14 @@ export function CreateDialog({
                               'w-[240px] pl-3 text-left font-normal',
                               !field.value && 'text-muted-foreground'
                             )}
-                            disabled={loading}
+                            disabled={fetcher.loading}
                           >
                             {field.value ? (
                               format(field.value, 'PPP')
                             ) : (
                               <span>Pick a date</span>
                             )}
-                            <Icons.Calendar className="ml-auto h-4 w-4 opacity-50" />
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
@@ -162,7 +162,7 @@ export function CreateDialog({
                   <FormItem>
                     <FormLabel>Tiêu đề</FormLabel>
                     <FormControl>
-                      <Input {...field} disabled={loading} />
+                      <Input {...field} disabled={fetcher.loading} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -175,7 +175,7 @@ export function CreateDialog({
                   <FormItem>
                     <FormLabel>Lí do</FormLabel>
                     <FormControl>
-                      <Textarea {...field} disabled={loading} />
+                      <Textarea {...field} disabled={fetcher.loading} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -183,7 +183,7 @@ export function CreateDialog({
               />
             </div>
             <DialogFooter>
-              <Button type="submit" disabled={loading}>
+              <Button type="submit" disabled={fetcher.loading}>
                 Gửi
               </Button>
             </DialogFooter>

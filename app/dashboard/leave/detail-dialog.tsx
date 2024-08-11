@@ -30,7 +30,7 @@ export function DetailDialog({
   reloadCalendar: () => void;
 }>) {
   const user = useUserStore((state) => state.user);
-  const { trigger } = useFetcher({
+  const fetcher = useFetcher({
     url: `${ENDPOINT.TICKETS}${event?.id}/`,
     method: 'PUT',
     onSuccess() {
@@ -60,7 +60,7 @@ export function DetailDialog({
   }
 
   function submitRequest(status: Leave['status']) {
-    trigger({
+    fetcher.trigger({
       body: { status }
     });
   }

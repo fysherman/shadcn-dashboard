@@ -17,7 +17,7 @@ const breadcrumbItems = [
 ];
 
 export default function Page() {
-  const { data, trigger } = useFetcher({
+  const fetcher = useFetcher({
     url: ENDPOINT.TICKETS,
     method: 'GET',
     triggerOnMount: true
@@ -46,7 +46,7 @@ export default function Page() {
   };
 
   const events = useMemo(() => {
-    const results: Leave[] = data?.results ?? [];
+    const results: Leave[] = fetcher.data?.results ?? [];
 
     return results
       .map<EventInput | undefined>((item) => {
@@ -91,7 +91,7 @@ export default function Page() {
         };
       })
       .filter((item) => item !== undefined);
-  }, [data]);
+  }, [fetcher.data]);
 
   function eventClick(arg: EventClickArg) {
     setClickedEvent(arg.event.extendedProps as Leave);
@@ -116,13 +116,13 @@ export default function Page() {
           open={openCreate}
           clickedDate={clickedDate}
           setOpen={setOpenCreate}
-          reloadCalendar={trigger}
+          reloadCalendar={fetcher.trigger}
         />
         <DetailDialog
           open={openDetail}
           event={clickedEvent}
           setOpen={setOpenDetail}
-          reloadCalendar={trigger}
+          reloadCalendar={fetcher.trigger}
         />
       </div>
     </PageContainer>

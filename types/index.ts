@@ -1,4 +1,4 @@
-import { Icons } from '@/components/icons';
+import { LucideIcon } from 'lucide-react';
 
 export type Nullable<T> = {
   [K in keyof T]: T[K] | null;
@@ -9,7 +9,7 @@ export interface NavItem {
   href?: string;
   disabled?: boolean;
   external?: boolean;
-  icon?: keyof typeof Icons;
+  icon?: LucideIcon;
   label?: string;
   description?: string;
   roles?: Role[];
@@ -38,6 +38,7 @@ export type SidebarNavItem = NavItemWithChildren;
 
 export type Employee = Partial<
   Nullable<{
+    address: string;
     id: number;
     email: string;
     employee_type: string;
@@ -45,10 +46,23 @@ export type Employee = Partial<
     image_profile: string;
     username: string;
     department: string;
+    division: string;
     birth_year: number;
     role: Role;
     manager: number;
     manager_name: string;
+    phone: string;
+    tax_id: string;
+    bank_account: string;
+    bank_center: string;
+    bank_name: string;
+    identification_back_image: string;
+    identification_front_image: string;
+    identification_card: string;
+    identification_issued_date: string;
+    identification_issued_place: string;
+    emergency_contact_name: string;
+    emergency_contact_phone: string;
   }>
 >;
 

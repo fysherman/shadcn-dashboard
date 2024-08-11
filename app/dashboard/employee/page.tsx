@@ -1,30 +1,28 @@
 'use client';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import PageContainer from '@/components/main-layout/page-container';
-import TalentTable from '@/components/tables/talent-tables';
-import { Skeleton } from '@/components/ui/skeleton';
+import EmployeeTable from '@/components/tables/employee-table';
 import useFetcher from '@/lib/fetcher';
 import { ENDPOINT } from '@/constants/endpoint';
 
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
-  { title: 'Talent', link: '/dashboard/talent' }
+  { title: 'Employee', link: '/dashboard/employee' }
 ];
 
 export default function Page() {
-  const { loading, data, error } = useFetcher({
+  const fetcher = useFetcher({
     url: ENDPOINT.EMPLOYEES,
     triggerOnMount: true
   });
 
-  const talents = data?.results ?? [];
+  const talents = fetcher.data?.results ?? [];
 
   return (
     <PageContainer>
       <div className="space-y-2">
         <Breadcrumbs items={breadcrumbItems} />
-        {loading && <Skeleton className=" h-60 w-full" />}
-        {!loading && !error && <TalentTable data={talents} />}
+        <EmployeeTable data={talents} />
       </div>
     </PageContainer>
   );

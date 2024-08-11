@@ -1,5 +1,5 @@
 'use client';
-import { Icons } from '@/components/icons';
+import { ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 
@@ -10,9 +10,9 @@ export default function BackButton() {
     <Button
       variant="ghost"
       size="icon"
-      onClick={() => router.push('/dashboard/talent')}
+      onClick={() => router.push('/dashboard/employee')}
     >
-      <Icons.ChevronLeft className=" h-8 w-8" />
+      <ChevronLeft className=" h-8 w-8" />
     </Button>
   );
 }

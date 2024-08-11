@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { Employee } from '@/types';
-import { Edit, MoreHorizontal, Trash } from 'lucide-react';
+import { MoreHorizontal, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -43,13 +43,10 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
           <DropdownMenuItem
-            onClick={() => router.push(`/dashboard/user/${data.id}`)}
+            onClick={() => router.push(`/dashboard/employee/${data.id}`)}
           >
-            <Edit className="mr-2 h-4 w-4" /> Update
+            <User className="mr-2 h-4 w-4" /> Chi tiết
           </DropdownMenuItem>
-          {/* <DropdownMenuItem onClick={() => setOpen(true)}>
-            <Trash className="mr-2 h-4 w-4" /> Delete
-          </DropdownMenuItem> */}
         </DropdownMenuContent>
       </DropdownMenu>
     </>

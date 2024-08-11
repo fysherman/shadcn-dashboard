@@ -1,5 +1,12 @@
 import { NavItem } from '@/types';
 import { ROLES } from '@/constants';
+import {
+  Calendar,
+  FileStack,
+  LayoutDashboardIcon,
+  PenTool,
+  SquareKanban
+} from 'lucide-react';
 
 export type Employee = {
   id: number;
@@ -23,29 +30,36 @@ export type Employee = {
 export const navItems: NavItem[] = [
   {
     title: 'Quản lí',
-    href: '/dashboard/talent',
-    icon: 'Dashboard',
-    label: 'Talent',
+    href: '/dashboard/employee',
+    icon: LayoutDashboardIcon,
+    label: 'Employee',
     roles: [ROLES.HR, ROLES.MANAGER, ROLES.MENTOR]
   },
   {
     title: 'Quản lí nghỉ phép',
     href: '/dashboard/leave',
-    icon: 'Calendar',
+    icon: Calendar,
     label: 'leave',
     roles: [ROLES.HR, ROLES.MANAGER, ROLES.MENTOR, ROLES.COLLABORATOR]
   },
   {
     title: 'Task',
     href: '/dashboard/task',
-    icon: 'Kanban',
+    icon: SquareKanban,
     label: 'task',
+    roles: [ROLES.HR, ROLES.MANAGER, ROLES.MENTOR, ROLES.COLLABORATOR]
+  },
+  {
+    title: 'Báo cáo',
+    href: '/dashboard/report',
+    icon: FileStack,
+    label: 'report',
     roles: [ROLES.HR, ROLES.MANAGER, ROLES.MENTOR, ROLES.COLLABORATOR]
   },
   {
     title: 'Đề nghị gia hạn hợp đồng',
     href: '/dashboard/contract',
-    icon: 'PenTool',
+    icon: PenTool,
     label: 'contract',
     roles: [ROLES.HR, ROLES.MANAGER, ROLES.MENTOR, ROLES.COLLABORATOR]
   }

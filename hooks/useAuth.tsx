@@ -8,7 +8,7 @@ export default function useAuth() {
   const router = useRouter();
   const user = useUserStore((state) => state.user);
   const setUser = useUserStore((state) => state.setUser);
-  const { trigger } = useFetcher({
+  const fetcher = useFetcher({
     url: ENDPOINT.ME,
     method: 'GET',
     silent: true,
@@ -24,6 +24,6 @@ export default function useAuth() {
   useLayoutEffect(() => {
     if (user?.id) return;
 
-    trigger();
+    fetcher.trigger();
   }, []);
 }

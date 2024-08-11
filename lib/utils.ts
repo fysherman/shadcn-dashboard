@@ -37,3 +37,7 @@ export function delay(time: number = 0): Promise<undefined> {
 export function upperCaseFirstLetter(string?: string | null) {
   return (string ?? '')[0]?.toUpperCase() ?? '';
 }
+
+export function fallbackValue(value?: any, fallback: string = 'Null'): string {
+  return value ? String(value) : fallback;
+}

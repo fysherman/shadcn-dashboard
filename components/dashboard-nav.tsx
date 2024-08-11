@@ -2,8 +2,6 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
-import { Icons } from '@/components/icons';
 import { cn } from '@/lib/utils';
 import { NavItem } from '@/types';
 import { Dispatch, SetStateAction } from 'react';
@@ -37,7 +35,8 @@ export function DashboardNav({
         {items
           .filter((item) => !item.roles || (role && item.roles.includes(role)))
           .map((item, index) => {
-            const Icon = Icons[item.icon ?? 'ArrowRight'];
+            const Icon = item.icon;
+
             return (
               item.href && (
                 <Tooltip key={`${index}/${item.href}`}>
@@ -46,15 +45,16 @@ export function DashboardNav({
                       href={item.disabled ? '/' : item.href}
                       className={cn(
                         'flex items-center gap-2 overflow-hidden rounded-md py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground',
-                        path === item.href ? 'bg-accent' : 'transparent',
+                        path.startsWith(item.href)
+                          ? 'bg-accent'
+                          : 'transparent',
                         item.disabled && 'cursor-not-allowed opacity-80'
                       )}
                       onClick={() => {
                         if (setOpen) setOpen(false);
                       }}
                     >
-                      <Icon className={`ml-3 size-5 flex-none`} />
-
+                      {Icon && <Icon className={`ml-3 size-5 flex-none`} />}
                       {isMobileNav || (!isMinimized && !isMobileNav) ? (
                         <span className="mr-2 truncate">{item.title}</span>
                       ) : (

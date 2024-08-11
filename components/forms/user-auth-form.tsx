@@ -20,12 +20,12 @@ import { ROLES } from '@/constants';
 
 export default function UserAuthForm() {
   const router = useRouter();
-  const { trigger, loading } = useFetcher({
+  const fetcher = useFetcher({
     url: ENDPOINT.LOGIN,
     method: 'POST',
     withToken: false
   });
-  const { trigger: getMe, loading: loadingGetMe } = useFetcher({
+  const fetcherMe = useFetcher({
     url: ENDPOINT.ME,
     method: 'GET'
   });
@@ -36,17 +36,18 @@ export default function UserAuthForm() {
       password: ''
     }
   });
+  const loading = fetcher.loading || fetcherMe.loading;
 
   function handleLoginSuccess(token: string) {
     localStorage.setItem('token', token);
 
-    getMe({
+    fetcherMe.trigger({
       onSuccess(data) {
         if (
           data?.role &&
           [ROLES.HR, ROLES.MANAGER, ROLES.MENTOR].includes(data.role)
         ) {
-          router.push('/dashboard/talent');
+          router.push('/dashboard/employee');
           return;
         }
         router.push('/dashboard/leave');
@@ -65,7 +66,7 @@ export default function UserAuthForm() {
   }
 
   async function handleSubmit(data: AuthSchema) {
-    await trigger({
+    await fetcher.trigger({
       body: data,
       silent: true,
       onSuccess(res) {
@@ -95,7 +96,7 @@ export default function UserAuthForm() {
                 <Input
                   type="text"
                   placeholder="Enter your account"
-                  disabled={loading || loadingGetMe}
+                  disabled={loading}
                   {...field}
                 />
               </FormControl>
@@ -113,7 +114,7 @@ export default function UserAuthForm() {
                 <Input
                   type="password"
                   placeholder="Enter your password"
-                  disabled={loading || loadingGetMe}
+                  disabled={loading}
                   {...field}
                 />
               </FormControl>
@@ -122,11 +123,7 @@ export default function UserAuthForm() {
           )}
         />
 
-        <Button
-          className="ml-auto w-full"
-          type="submit"
-          disabled={loading || loadingGetMe}
-        >
+        <Button className="ml-auto w-full" type="submit" disabled={loading}>
           Continue
         </Button>
       </form>

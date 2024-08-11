@@ -23,12 +23,12 @@ import { taskColumns } from '@/constants';
 import { DetailDialog } from './detail-dialog';
 
 export function KanbanBoard() {
-  const { data, trigger } = useFetcher({
+  const fetcher = useFetcher({
     url: ENDPOINT.TASKS,
     method: 'GET',
     triggerOnMount: true
   });
-  const tasks: Task[] = data?.results ?? [];
+  const tasks: Task[] = fetcher.data?.results ?? [];
   // const columns = useTaskStore((state) => state.columns);
   const columnsId = taskColumns.map((col) => col.id);
 
@@ -156,7 +156,7 @@ export function KanbanBoard() {
         open={openDetail}
         task={activeTask}
         setOpen={setOpenDetail}
-        reloadKanban={trigger}
+        reloadKanban={fetcher.trigger}
       />
     </>
   );

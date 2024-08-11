@@ -14,11 +14,27 @@ import {
 import { useRouter } from 'next/navigation';
 import { useUserStore } from '@/store/user-store';
 import { upperCaseFirstLetter } from '@/lib/utils';
+import { useMemo } from 'react';
 
 export function UserNav() {
   const router = useRouter();
   const user = useUserStore((state) => state.user);
   const setUser = useUserStore((state) => state.setUser);
+  const needUpdateProfile = useMemo(() => {
+    if (!user) return false;
+
+    return [
+      user.fullname,
+      user.phone,
+      user.tax_id,
+      user.address,
+      user.bank_account,
+      user.identification_card,
+      user.identification_front_image,
+      user.identification_back_image,
+      user.emergency_contact_phone
+    ].some((item) => !item);
+  }, [user]);
 
   function handleLogout() {
     localStorage.removeItem('token');
@@ -41,7 +57,9 @@ export function UserNav() {
               </AvatarFallback>
             </Avatar>
           </Button>
-          <span className=" absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-red-500" />
+          {needUpdateProfile && (
+            <span className=" absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-red-500" />
+          )}
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
@@ -57,9 +75,11 @@ export function UserNav() {
         <DropdownMenuGroup onClick={() => router.push('/setting/profile')}>
           <DropdownMenuItem>
             Profile
-            <Badge variant="destructive" className=" ml-auto">
-              Update
-            </Badge>
+            {needUpdateProfile && (
+              <Badge variant="destructive" className=" ml-auto">
+                Update
+              </Badge>
+            )}
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
