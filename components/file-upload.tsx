@@ -2,7 +2,6 @@
 import { Trash } from 'lucide-react';
 import Image from 'next/image';
 import { UploadFileResponse } from 'uploadthing/client';
-import { IMG_MAX_LIMIT } from './forms/product-form';
 import { Button } from './ui/button';
 
 interface ImageUploadProps {
@@ -47,7 +46,7 @@ export default function FileUpload({ onRemove, value }: ImageUploadProps) {
             </div>
           ))}
       </div>
-      <div>{value.length < IMG_MAX_LIMIT && <></>}</div>
+      {/* <div>{value.length < IMG_MAX_LIMIT && <></>}</div> */}
     </div>
   );
 }
