@@ -43,6 +43,10 @@ export function Detail() {
         <Label>Employee type</Label>
         <p className=" text-gray-500">{fallbackValue(user?.employee_type)}</p>
       </div>
+      <div className=" col-span-3">
+        <Label>Manager</Label>
+        <p className=" text-gray-500">{fallbackValue(user?.manager_name)}</p>
+      </div>
       <div className=" col-span-1">
         <Label>Division</Label>
         <p className=" text-gray-500">{fallbackValue(user?.division)}</p>
