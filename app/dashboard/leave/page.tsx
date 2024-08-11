@@ -45,7 +45,7 @@ export default function Page() {
     }
   };
 
-  const events = useMemo(() => {
+  const events: EventInput[] = useMemo(() => {
     const results: Leave[] = fetcher.data?.results ?? [];
 
     return results
@@ -90,7 +90,7 @@ export default function Page() {
           textColor: colorMapping.text
         };
       })
-      .filter((item) => item !== undefined);
+      .filter<EventInput>((item) => item !== undefined);
   }, [fetcher.data]);
 
   function eventClick(arg: EventClickArg) {
