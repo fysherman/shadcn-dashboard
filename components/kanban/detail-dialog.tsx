@@ -5,6 +5,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogOverlay,
   DialogTitle
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
@@ -20,6 +21,7 @@ import { upperCaseFirstLetter } from '@/lib/utils';
 import { TASK_STATUS } from '@/constants';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
+import { ScrollArea } from '../ui/scroll-area';
 
 export function DetailDialog({
   open,
@@ -32,7 +34,15 @@ export function DetailDialog({
   setOpen: (state: boolean) => void;
   reloadKanban: () => void;
 }>) {
-  console.log('🚀 ~ task:', task);
+  const fetcher = useFetcher({
+    url: `${ENDPOINT.TASKS}${task?.id}`,
+    method: 'PUT',
+    onSuccess() {
+      toast.success('Cập nhật thành công');
+      reloadKanban();
+      handleOpenChange(false);
+    }
+  });
   let statusVariant = 'bg-gray-500';
 
   switch (task?.status) {
@@ -50,7 +60,7 @@ export function DetailDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className=" max-w-4xl">
+      <DialogContent className="  max-w-4xl">
         <DialogHeader>
           <DialogTitle>Task</DialogTitle>
           <DialogDescription>Chi tiết task</DialogDescription>
@@ -109,7 +119,16 @@ export function DetailDialog({
             <Label>Mô tả</Label>
             <Textarea value={task?.desc} rows={5} />
           </div>
+          <div className=" space-y-2">
+            <Label>Comment</Label>
+            <Textarea value={task?.desc} rows={5} />
+          </div>
         </div>
+        <DialogFooter>
+          <Button type="submit" form="task-form">
+            Cập nhật
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

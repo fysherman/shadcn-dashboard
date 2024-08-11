@@ -21,6 +21,7 @@ import { ENDPOINT } from '@/constants/endpoint';
 import { Task, TaskStatus } from '@/types';
 import { taskColumns } from '@/constants';
 import { DetailDialog } from './detail-dialog';
+import { useTaskStore } from '@/store/task-store';
 
 export function KanbanBoard() {
   const fetcher = useFetcher({
@@ -28,6 +29,7 @@ export function KanbanBoard() {
     method: 'GET',
     triggerOnMount: true
   });
+  const kanbanKey = useTaskStore((state) => state.kanbanKey);
   const tasks: Task[] = fetcher.data?.results ?? [];
   // const columns = useTaskStore((state) => state.columns);
   const columnsId = taskColumns.map((col) => col.id);
@@ -120,6 +122,10 @@ export function KanbanBoard() {
     // Clear active task on close detail dialog
     if (!openDetail) setActiveTask(null);
   }, [openDetail]);
+
+  useEffect(() => {
+    if (!fetcher.loading) fetcher.trigger();
+  }, [kanbanKey]);
 
   return (
     <>

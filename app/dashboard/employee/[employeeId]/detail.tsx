@@ -8,7 +8,7 @@ import { fallbackValue, upperCaseFirstLetter } from '@/lib/utils';
 import { Employee } from '@/types';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 
 export function Detail() {
   const params = useParams();
@@ -39,14 +39,15 @@ export function Detail() {
           <p className=" text-gray-500">{user?.email}</p>
         </div>
       </div>
-      <div className=" col-span-3">
+      <div className=" col-span-1">
         <Label>Employee type</Label>
         <p className=" text-gray-500">{fallbackValue(user?.employee_type)}</p>
       </div>
-      <div className=" col-span-3">
-        <Label>Manager</Label>
+      <div className=" col-span-1">
+        <Label>Quản lí</Label>
         <p className=" text-gray-500">{fallbackValue(user?.manager_name)}</p>
       </div>
+      <div className="col-span-1"></div>
       <div className=" col-span-1">
         <Label>Division</Label>
         <p className=" text-gray-500">{fallbackValue(user?.division)}</p>

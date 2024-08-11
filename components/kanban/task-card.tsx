@@ -5,6 +5,7 @@ import { cva } from 'class-variance-authority';
 import { Badge } from '../ui/badge';
 import { Avatar, AvatarFallback } from '../ui/avatar';
 import { Task } from '@/types';
+import { upperCaseFirstLetter } from '@/lib/utils';
 
 interface TaskCardProps {
   task: Task;
@@ -71,9 +72,12 @@ export function TaskCard({ task, isOverlay }: Readonly<TaskCardProps>) {
           <p className="line-clamp-3 whitespace-pre-wrap text-left">
             {task.title}
           </p>
-          <div className="flex justify-end">
+          <div className="flex items-center justify-end space-x-2">
+            <p className=" text-gray-500">{task.assignee_name}</p>
             <Avatar className=" h-8 w-8">
-              <AvatarFallback>A</AvatarFallback>
+              <AvatarFallback>
+                {upperCaseFirstLetter(task.assignee_name)}
+              </AvatarFallback>
             </Avatar>
           </div>
         </div>

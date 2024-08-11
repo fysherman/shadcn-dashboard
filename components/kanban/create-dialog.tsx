@@ -24,20 +24,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { TaskSchema, taskSchema } from '@/lib/form-schema';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import useFetcher from '@/lib/fetcher';
 import { ENDPOINT } from '@/constants/endpoint';
 import { useUserStore } from '@/store/user-store';
 import { ROLES } from '@/constants';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select';
 import { Employee } from '@/types';
 import { Check, ChevronsUpDown, Plus } from 'lucide-react';
 import {
@@ -48,20 +39,24 @@ import {
   CommandItem,
   CommandList
 } from '@/components/ui/command';
-import { Command as A } from 'cmdk';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import { FocusScope } from '@radix-ui/react-focus-scope';
+import { DismissableLayer } from '@radix-ui/react-dismissable-layer';
+import { useTaskStore } from '@/store/task-store';
 
 export default function CreateDialog() {
+  const setKey = useTaskStore((state) => state.setKey);
   const fetcher = useFetcher({
     url: ENDPOINT.TASKS,
     method: 'POST',
     onSuccess() {
       toast.success('Tạo task thành công');
+      setKey();
       setOpen(false);
     }
   });
@@ -106,10 +101,7 @@ export default function CreateDialog() {
           <Plus className=" mr-2 h-4 w-4" /> Tạo task
         </Button>
       </DialogTrigger>
-      <DialogContent
-        className=" max-w-2xl"
-        // onPointerDownOutside={(e) => openCombobox && e.preventDefault()}
-      >
+      <DialogContent className=" max-w-2xl">
         <DialogHeader>
           <DialogTitle>Tạo task</DialogTitle>
           <DialogDescription>Task công việc</DialogDescription>
@@ -132,68 +124,71 @@ export default function CreateDialog() {
                       open={openCombobox}
                       onOpenChange={setOpenCombobox}
                     >
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant="outline"
-                            role="combobox"
-                            className={cn(
-                              'w-[200px] justify-between',
-                              !field.value && 'text-muted-foreground'
-                            )}
-                          >
-                            {field.value
-                              ? employees.find(
-                                  (employee) =>
-                                    employee?.id?.toString() === field.value
-                                )?.username
-                              : 'Select assignee'}
-                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-[200px] p-0">
-                        <Command>
-                          <CommandInput
-                            placeholder="Search assignee..."
-                            autoFocus
-                          />
-                          <CommandList>
-                            <CommandEmpty>No employee found.</CommandEmpty>
-                            <CommandGroup>
-                              {employees.map((employee) => (
-                                <CommandItem
-                                  key={employee.id}
-                                  value={employee.id?.toString()}
-                                  onSelect={() => {
-                                    if (
-                                      employee?.id === undefined ||
-                                      employee?.id === null
-                                    )
-                                      return;
+                      <FocusScope loop trapped>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className={cn(
+                                'w-[320px] justify-between',
+                                !field.value && 'text-muted-foreground'
+                              )}
+                              disabled={fetcher.loading}
+                            >
+                              {field.value
+                                ? employees.find(
+                                    (employee) =>
+                                      employee?.id?.toString() === field.value
+                                  )?.username
+                                : 'Select assignee'}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <DismissableLayer>
+                          <PopoverContent className="w-[320px] p-0">
+                            <Command>
+                              <CommandInput placeholder="Search assignee..." />
+                              <CommandList>
+                                <CommandEmpty>No employee found.</CommandEmpty>
+                                <CommandGroup>
+                                  {employees.map((employee) => (
+                                    <CommandItem
+                                      key={employee.id}
+                                      value={employee.username ?? ''}
+                                      onSelect={() => {
+                                        if (
+                                          employee?.id === undefined ||
+                                          employee?.id === null
+                                        )
+                                          return;
 
-                                    form.setValue(
-                                      'assignee',
-                                      employee.id?.toString()
-                                    );
-                                    setOpenCombobox(false);
-                                  }}
-                                >
-                                  <Check
-                                    className={cn(
-                                      'mr-2 h-4 w-4',
-                                      field.value === employee.id?.toString()
-                                        ? 'opacity-100'
-                                        : 'opacity-0'
-                                    )}
-                                  />
-                                  {employee.username} - {employee.email}
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </PopoverContent>
+                                        form.setValue(
+                                          'assignee',
+                                          employee.id?.toString()
+                                        );
+                                        setOpenCombobox(false);
+                                      }}
+                                    >
+                                      <Check
+                                        className={cn(
+                                          'mr-2 h-4 w-4',
+                                          field.value ===
+                                            employee.id?.toString()
+                                            ? 'opacity-100'
+                                            : 'opacity-0'
+                                        )}
+                                      />
+                                      {employee.username} - {employee.email}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </DismissableLayer>
+                      </FocusScope>
                     </Popover>
                     <FormMessage />
                   </FormItem>
@@ -229,7 +224,7 @@ export default function CreateDialog() {
           </form>
         </Form>
         <DialogFooter>
-          <Button type="submit" form="task-form">
+          <Button type="submit" form="task-form" disabled={fetcher.loading}>
             Tạo task
           </Button>
         </DialogFooter>
