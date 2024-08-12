@@ -48,6 +48,7 @@ export type Employee = Partial<
     department: string;
     division: string;
     birth_year: number;
+    birth_date: string;
     role: Role;
     manager: number;
     manager_name: string;
