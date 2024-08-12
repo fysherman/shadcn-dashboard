@@ -51,6 +51,8 @@ export type Employee = Partial<
     role: Role;
     manager: number;
     manager_name: string;
+    manager_division_id: string;
+    manager_division_name: string;
     phone: string;
     tax_id: string;
     bank_account: string;
@@ -97,3 +99,48 @@ export type Task = {
   comment: string | null;
   index: number;
 };
+
+export type ReportStatus = 'PENDING' | 'DONE';
+
+export type Report = Nullable<{
+  id: number;
+  title: string;
+  status: ReportStatus;
+  from_date: string;
+  to_date: string;
+  percentage: string;
+  tasks: Task[];
+  created: string;
+  updated: string;
+  created_by: number;
+  created_by_name: string;
+  creator_comment: string;
+  approved_by: number;
+  approved_by_name: string;
+  approved_comment: string;
+}>;
+
+export type ContractStatus =
+  | 'HR_CREATED'
+  | 'COLLABORATOR_SUBMITTED'
+  | 'MENTOR_REVIEWED'
+  | 'MANAGER_REVIEWED';
+
+export type Contract = Nullable<{
+  id: number;
+  title: string;
+  desc: string;
+  status: ContractStatus;
+  from_date: string;
+  to_date: string;
+  created: string;
+  updated: string;
+  hr: number;
+  hr_name: number;
+  manager: number;
+  manager_name: string;
+  manager_review: any;
+  mentor: number;
+  mentor_name: number;
+  mentor_review: number;
+}>;

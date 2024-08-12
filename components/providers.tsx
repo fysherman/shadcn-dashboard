@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import ThemeProvider from './ThemeToggle/theme-provider';
-import { TooltipProvider } from '../ui/tooltip';
+import { TooltipProvider } from './ui/tooltip';
 
 export default function Providers({
   children

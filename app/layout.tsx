@@ -1,10 +1,11 @@
-import Providers from '@/components/main-layout/providers';
+import Providers from '@/components/providers';
 import { Toaster } from '@/components/ui/sonner';
 import '@uploadthing/react/styles.css';
 import type { Metadata } from 'next';
 import NextTopLoader from 'nextjs-toploader';
 import { Inter } from 'next/font/google';
 import './globals.css';
+import AuthGuard from '@/components/auth-guard';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -25,8 +26,10 @@ export default async function RootLayout({
       >
         <NextTopLoader color="#16a34a" showSpinner={false} />
         <Providers>
-          <Toaster richColors />
-          {children}
+          <AuthGuard>
+            <Toaster richColors />
+            {children}
+          </AuthGuard>
         </Providers>
       </body>
     </html>

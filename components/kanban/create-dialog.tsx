@@ -36,6 +36,7 @@ import { useTaskStore } from '@/store/task-store';
 import { Combobox, ComboboxContent, ComboboxTrigger } from '../combobox';
 
 export default function CreateDialog() {
+  const role = useUserStore((state) => state.role);
   const setKey = useTaskStore((state) => state.setKey);
   const fetcher = useFetcher({
     url: ENDPOINT.TASKS,
@@ -46,13 +47,11 @@ export default function CreateDialog() {
       setOpen(false);
     }
   });
-  const fetcherEmployees = useFetcher({
+  const employeeFetcher = useFetcher({
     url: ENDPOINT.EMPLOYEES,
     method: 'GET',
-    silent: true,
-    triggerOnMount: true
+    silent: true
   });
-  const role = useUserStore((state) => state.role);
   const form = useForm<TaskSchema>({
     resolver: zodResolver(taskSchema),
     defaultValues: {
@@ -62,7 +61,7 @@ export default function CreateDialog() {
   });
   const [open, setOpen] = useState(false);
   const [openCombobox, setOpenCombobox] = useState(false);
-  const employees: Employee[] = fetcherEmployees.data?.results ?? [];
+  const employees: Employee[] = employeeFetcher.data?.results ?? [];
 
   async function handleSubmit(data: TaskSchema) {
     try {
@@ -74,6 +73,12 @@ export default function CreateDialog() {
       });
     } catch (error) {}
   }
+
+  useEffect(() => {
+    if (!role || role === ROLES.COLLABORATOR) return;
+
+    employeeFetcher.trigger();
+  }, [role]);
 
   useEffect(() => {
     if (!open) form.reset();

@@ -13,7 +13,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Leave } from '@/types';
 import { format } from 'date-fns';
 import { useUserStore } from '@/store/user-store';
-import { Badge } from '@/components/ui/badge';
+import { Badge, BadgeProps } from '@/components/ui/badge';
 import useFetcher from '@/lib/fetcher';
 import { ENDPOINT } from '@/constants/endpoint';
 import { upperCaseFirstLetter } from '@/lib/utils';
@@ -42,17 +42,16 @@ export function DetailDialog({
   const submitterName = event?.submitted_by_name ?? '';
   const approverName = event?.approved_by_name ?? '';
   const isApprover = user?.id === event?.approved_by;
-  let statusVariant: 'default' | 'secondary' | 'destructive' = 'secondary';
 
-  switch (event?.status) {
-    case 'APPROVED':
-      statusVariant = 'default';
-      break;
-    case 'REJECTED':
-      statusVariant = 'destructive';
-      break;
-    default:
-      break;
+  function getStatusVariant(): BadgeProps['variant'] {
+    switch (event?.status) {
+      case 'APPROVED':
+        return 'default';
+      case 'REJECTED':
+        return 'destructive';
+      default:
+        return 'secondary';
+    }
   }
 
   function handleOpenChange(state: boolean) {
@@ -73,7 +72,7 @@ export function DetailDialog({
           <DialogDescription>Chi tiết đơn xin nghỉ phép</DialogDescription>
         </DialogHeader>
         <div className=" space-y-4 py-4">
-          <Badge variant={statusVariant}>{event?.status}</Badge>
+          <Badge variant={getStatusVariant()}>{event?.status}</Badge>
           <div className=" grid grid-cols-4 items-center gap-4">
             <Label>Người gửi</Label>
             <div className=" col-span-3 flex items-center space-x-4">

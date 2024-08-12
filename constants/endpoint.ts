@@ -6,7 +6,8 @@ export const ENDPOINT = {
   LOGIN: '/auth/login/',
   EMPLOYEES: '/api/employees/',
   CONTRACTS: '/api/contracts/',
-  ME: '/me/',
+  REPORTS: '/api/reports/',
   TICKETS: '/api/tickets/',
-  TASKS: '/api/tasks/'
+  TASKS: '/api/tasks/',
+  ME: '/me/'
 };

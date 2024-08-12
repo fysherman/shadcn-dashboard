@@ -89,6 +89,7 @@ export default function useFetcher(initParams: Readonly<FetcherParams> = {}) {
       fetcherResponse.error = error;
 
       if (error.message === '401') router.push('/sign-in');
+      if (error.message === '403') router.push('/forbidden');
       if (!silent) toast.error('Đã xảy ra lỗi');
     } finally {
       onSettled();

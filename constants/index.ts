@@ -1,4 +1,4 @@
-import { Role, TaskStatus } from '@/types';
+import { ContractStatus, Role, TaskStatus } from '@/types';
 
 export const ROLES: Record<Role, Role> = {
   HR: 'HR',
@@ -27,3 +27,10 @@ export const taskColumns: { id: TaskStatus; title: string }[] = [
     title: 'Done'
   }
 ];
+
+export const CONTRACT_STATUS: Record<ContractStatus, ContractStatus> = {
+  HR_CREATED: 'HR_CREATED',
+  COLLABORATOR_SUBMITTED: 'COLLABORATOR_SUBMITTED',
+  MENTOR_REVIEWED: 'MENTOR_REVIEWED',
+  MANAGER_REVIEWED: 'MANAGER_REVIEWED'
+};

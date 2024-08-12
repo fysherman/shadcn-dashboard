@@ -7,16 +7,16 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { useContractStore } from '@/store/contract-store';
-import { Contract } from '@/types';
+import { useReportStore } from '@/store/report-store';
+import { Report } from '@/types';
 import { MoreHorizontal, Package } from 'lucide-react';
 
 interface CellActionProps {
-  data: Contract;
+  data: Report;
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
-  const setOpenDetail = useContractStore((state) => state.setOpenDetail);
+  const setOpenDetail = useReportStore((state) => state.setOpenDetail);
 
   return (
     <DropdownMenu modal={false}>
@@ -28,11 +28,12 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
+
         <DropdownMenuItem
           className=" cursor-pointer"
           onClick={() => setOpenDetail(data)}
         >
-          <Package className="mr-2 h-4 w-4" /> Xem / Cập nhật hợp đồng
+          <Package className="mr-2 h-4 w-4" /> Chi tiết
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

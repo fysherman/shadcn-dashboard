@@ -32,7 +32,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { taskSchema, TaskSchema } from '@/lib/form-schema';
 import { Combobox, ComboboxContent, ComboboxTrigger } from '../combobox';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export function DetailDialog({
   open,
@@ -52,14 +52,13 @@ export function DetailDialog({
     onSuccess() {
       toast.success('Cập nhật thành công');
       reloadKanban();
-      handleOpenChange(false);
+      setOpen(false);
     }
   });
-  const fetcherEmployees = useFetcher({
+  const employeeFetcher = useFetcher({
     url: ENDPOINT.EMPLOYEES,
     method: 'GET',
-    silent: true,
-    triggerOnMount: true
+    silent: true
   });
   const form = useForm<TaskSchema>({
     resolver: zodResolver(taskSchema),
@@ -71,13 +70,9 @@ export function DetailDialog({
     }
   });
   const [openCombobox, setOpenCombobox] = useState(false);
-  const employees: Employee[] = fetcherEmployees.data?.results ?? [];
+  const employees: Employee[] = employeeFetcher.data?.results ?? [];
   const enableUpdate =
     role && [ROLES.HR, ROLES.MANAGER, ROLES.MENTOR].includes(role);
-
-  function handleOpenChange(state: boolean) {
-    setOpen(state);
-  }
 
   function getStatusVariant() {
     switch (task?.status) {
@@ -99,8 +94,25 @@ export function DetailDialog({
     });
   }
 
+  useEffect(() => {
+    if (!role || role === ROLES.COLLABORATOR) return;
+
+    employeeFetcher.trigger();
+  }, [role]);
+
+  useEffect(() => {
+    if (open) {
+      form.reset({
+        title: task?.title,
+        desc: task?.desc,
+        assignee: task?.assignee.toString(),
+        comment: task?.comment ?? ''
+      });
+    }
+  }, [open]);
+
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="  max-w-4xl">
         <DialogHeader>
           <DialogTitle>Task</DialogTitle>
@@ -134,57 +146,73 @@ export function DetailDialog({
                   </div>
                 </div>
                 <div className=" space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="assignee"
-                    render={({ field }) => (
-                      <FormItem className=" col-span-1 flex flex-col">
-                        <FormLabel>Assignee</FormLabel>
-                        <Combobox
-                          modal
-                          open={openCombobox}
-                          onOpenChange={setOpenCombobox}
-                        >
-                          <FormControl>
-                            <ComboboxTrigger
-                              className={cn(
-                                'w-full justify-between',
-                                !field.value && 'text-muted-foreground'
-                              )}
-                              disabled={fetcher.loading || !enableUpdate}
-                            >
-                              {field.value
-                                ? employees.find(
-                                    (employee) =>
-                                      employee?.id?.toString() === field.value
-                                  )?.username
-                                : 'Select assignee'}
-                            </ComboboxTrigger>
-                          </FormControl>
-                          <ComboboxContent
-                            items={employees.map((item) => ({
-                              key: item.id ?? '',
-                              value: item.username ?? '',
-                              label: `${item.username} - ${item.email}`,
-                              rawValue: item.id,
-                              selected: field.value === item.id?.toString()
-                            }))}
-                            className="w-[320px] p-0"
-                            onSelect={(employee) => {
-                              if (!employee.rawValue) return;
+                  {enableUpdate ? (
+                    <FormField
+                      control={form.control}
+                      name="assignee"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Assignee</FormLabel>
+                          <Combobox
+                            modal
+                            open={openCombobox}
+                            onOpenChange={setOpenCombobox}
+                          >
+                            <FormControl>
+                              <ComboboxTrigger
+                                className={cn(
+                                  'w-full justify-between',
+                                  !field.value && 'text-muted-foreground'
+                                )}
+                                disabled={
+                                  fetcher.loading || employeeFetcher.loading
+                                }
+                              >
+                                {field.value
+                                  ? employees.find(
+                                      (employee) =>
+                                        employee?.id?.toString() === field.value
+                                    )?.username
+                                  : 'Select assignee'}
+                              </ComboboxTrigger>
+                            </FormControl>
+                            <ComboboxContent
+                              items={employees.map((item) => ({
+                                key: item.id ?? '',
+                                value: item.username ?? '',
+                                label: `${item.username} - ${item.email}`,
+                                rawValue: item.id,
+                                selected: field.value === item.id?.toString()
+                              }))}
+                              className="w-[320px] p-0"
+                              onSelect={(employee) => {
+                                if (!employee.rawValue) return;
 
-                              form.setValue(
-                                'assignee',
-                                employee.rawValue.toString()
-                              );
-                              setOpenCombobox(false);
-                            }}
-                          ></ComboboxContent>
-                        </Combobox>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                                form.setValue(
+                                  'assignee',
+                                  employee.rawValue.toString()
+                                );
+                                setOpenCombobox(false);
+                              }}
+                            ></ComboboxContent>
+                          </Combobox>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  ) : (
+                    <div className=" space-y-2">
+                      <Label>Assignee</Label>
+                      <div className=" flex items-center space-x-4">
+                        <Avatar className=" h-8 w-8">
+                          <AvatarFallback>
+                            {upperCaseFirstLetter(task?.assignee_name)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <p>{task?.assignee_name}</p>
+                      </div>
+                    </div>
+                  )}
                   <div className=" space-y-2">
                     <Label>Reporter</Label>
                     <div className=" flex items-center space-x-4">

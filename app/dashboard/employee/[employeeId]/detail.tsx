@@ -1,11 +1,18 @@
 'use client';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
 import { Label } from '@/components/ui/label';
 import { ENDPOINT } from '@/constants/endpoint';
 import useFetcher from '@/lib/fetcher';
 import { fallbackValue, upperCaseFirstLetter } from '@/lib/utils';
 import { Employee } from '@/types';
+import { LayoutGrid } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -128,20 +135,32 @@ export function Detail() {
           style={{ width: '100%', height: 'auto' }}
         />
       </div>
-      <div className="col-span-3 flex space-x-2">
-        <Button asChild>
-          <Link href={`/dashboard/task?create-user=${user?.id}`}>Tạo task</Link>
-        </Button>
-        <Button asChild>
-          <Link href={`/dashboard/report?create-user=${user?.id}`}>
-            Tạo báo cáo
-          </Link>
-        </Button>
-        <Button asChild>
-          <Link href={`/dashboard/contract?create-user=${user?.id}`}>
-            Đề nghị gia hạn hợp đồng
-          </Link>
-        </Button>
+      <div className="col-span-3 flex space-x-2 pt-4">
+        <DropdownMenu>
+          <DropdownMenuTrigger>
+            <Button>
+              <LayoutGrid className=" mr-2 h-4 w-4" /> Actions
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem>
+              <Link href={`/dashboard/task?create-user=${user?.id}`}>
+                Tạo task
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href={`/dashboard/report?create-user=${user?.id}`}>
+                Tạo báo cáo
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href={`/dashboard/contract?create-user=${user?.id}`}>
+                Đề nghị gia hạn hợp đồng
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem>Export dữ liệu hợp đồng</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );
