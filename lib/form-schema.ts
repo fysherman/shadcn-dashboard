@@ -11,7 +11,8 @@ export type LeaveSchema = z.infer<typeof leaveSchema>;
 export const taskSchema = z.object({
   title: z.string().min(1),
   desc: z.string().min(1),
-  assignee: z.string()
+  assignee: z.string().min(1),
+  comment: z.string().optional()
 });
 
 export type TaskSchema = z.infer<typeof taskSchema>;

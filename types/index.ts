@@ -95,4 +95,5 @@ export type Task = {
   created: string;
   updated: string;
   comment: string | null;
+  index: number;
 };

@@ -18,6 +18,11 @@ export interface FetcherParams {
   onSettled?: () => void;
 }
 
+interface FetcherResponse {
+  data: any;
+  error: any;
+}
+
 export default function useFetcher(initParams: Readonly<FetcherParams> = {}) {
   let triggeredOnMount = false;
   const router = useRouter();
@@ -62,6 +67,10 @@ export default function useFetcher(initParams: Readonly<FetcherParams> = {}) {
       headers: computedHeaders,
       body: rawBody ?? JSON.stringify(body)
     };
+    const fetcherResponse: FetcherResponse = {
+      data: undefined,
+      error: undefined
+    };
 
     try {
       const response = await fetch(computedUrl, resources);
@@ -72,20 +81,21 @@ export default function useFetcher(initParams: Readonly<FetcherParams> = {}) {
 
       setData(data);
       onSuccess(data);
-
+      fetcherResponse.data = data;
       console.info(url, data);
     } catch (error: any) {
       setError(error);
       onError(error);
+      fetcherResponse.error = error;
 
       if (error.message === '401') router.push('/sign-in');
       if (!silent) toast.error('Đã xảy ra lỗi');
-
-      console.warn(url, error);
     } finally {
       onSettled();
       setLoading(false);
     }
+
+    return fetcherResponse;
   }
 
   useEffect(() => {

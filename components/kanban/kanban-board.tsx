@@ -22,29 +22,86 @@ import { Task, TaskStatus } from '@/types';
 import { taskColumns } from '@/constants';
 import { DetailDialog } from './detail-dialog';
 import { useTaskStore } from '@/store/task-store';
+import { toast } from 'sonner';
+
+type UpdatePayload = {
+  id: number;
+  status?: TaskStatus;
+  index?: number;
+};
 
 export function KanbanBoard() {
+  const kanbanKey = useTaskStore((state) => state.kanbanKey);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [originalTasks, setOriginalTasks] = useState<Task[]>([]);
   const fetcher = useFetcher({
     url: ENDPOINT.TASKS,
     method: 'GET',
-    triggerOnMount: true
-  });
-  const kanbanKey = useTaskStore((state) => state.kanbanKey);
-  const tasks: Task[] = fetcher.data?.results ?? [];
-  // const columns = useTaskStore((state) => state.columns);
-  const columnsId = taskColumns.map((col) => col.id);
+    triggerOnMount: true,
+    onSuccess(data) {
+      const tasks = data?.results ?? [];
 
-  // const tasks = useTaskStore((state) => state.tasks);
-  // const setTasks = useTaskStore((state) => state.setTasks);
+      setTasks(tasks);
+      setOriginalTasks(JSON.parse(JSON.stringify(tasks)));
+    }
+  });
+  const updateFetcher = useFetcher({
+    method: 'PUT',
+    silent: true
+  });
 
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [openDetail, setOpenDetail] = useState<boolean>(false);
-
+  const columnsId = taskColumns.map((col) => col.id);
   const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
 
+  async function runUpdateJobs() {
+    const jobs: UpdatePayload[] = tasks
+      .map<UpdatePayload>(({ id, status }, ind) => {
+        const originalTask = originalTasks.find((task) => task.id === id);
+        const payload: UpdatePayload = { id };
+
+        if (!originalTask) return payload;
+
+        if (originalTask.status !== status) payload.status = status;
+        if (originalTask.index !== ind) payload.index = ind;
+
+        return payload;
+      })
+      .filter((payload) => Object.keys(payload).length > 1);
+
+    if (!jobs.length) return;
+
+    try {
+      setLoading(true);
+      const response = await Promise.all(
+        jobs.map((job) =>
+          updateFetcher.trigger({
+            url: `${ENDPOINT.TASKS}${job.id}`,
+            body: {
+              status: job.status,
+              index: job.index
+            }
+          })
+        )
+      );
+
+      const error = response.find((item) => item.error);
+
+      if (error) throw new Error(String(error));
+
+      toast.success('Cập nhật thành công');
+    } catch (error) {
+      console.log('🚀 ~ runUpdateJobs ~ error:', error);
+      toast.error('Đã xảy ra lỗi');
+    } finally {
+      setLoading(false);
+    }
+  }
+
   function onDragStart(event: DragStartEvent) {
-    console.log('start');
     if (!hasDraggableData(event.active)) return;
 
     const data = event.active.data.current;
@@ -57,7 +114,6 @@ export function KanbanBoard() {
   function onDragMove(event: DragMoveEvent) {
     if (!hasDraggableData(event.active)) return;
 
-    console.log('move');
     setIsDragging(true);
   }
 
@@ -70,6 +126,7 @@ export function KanbanBoard() {
 
     setActiveTask(null);
     setIsDragging(false);
+    runUpdateJobs();
   }
 
   function onDragOver(event: DragOverEvent) {
@@ -99,10 +156,10 @@ export function KanbanBoard() {
       const overTask = tasks[overIndex];
       if (activeTask && overTask && activeTask.status !== overTask.status) {
         activeTask.status = overTask.status;
-        // setTasks(arrayMove(tasks, activeIndex, overIndex - 1));
+        setTasks(arrayMove(tasks, activeIndex, overIndex - 1));
       }
 
-      // setTasks(arrayMove(tasks, activeIndex, overIndex));
+      setTasks(arrayMove(tasks, activeIndex, overIndex));
     }
 
     const isOverAColumn = overData?.type === 'Column';
@@ -113,7 +170,7 @@ export function KanbanBoard() {
       const activeTask = tasks[activeIndex];
       if (activeTask) {
         activeTask.status = overId as TaskStatus;
-        // setTasks(arrayMove(tasks, activeIndex, activeIndex));
+        setTasks(arrayMove(tasks, activeIndex, activeIndex));
       }
     }
   }

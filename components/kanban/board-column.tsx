@@ -1,4 +1,4 @@
-import { useDndContext, type UniqueIdentifier } from '@dnd-kit/core';
+import { useDndContext } from '@dnd-kit/core';
 import { SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { cva } from 'class-variance-authority';
@@ -6,10 +6,10 @@ import { useMemo } from 'react';
 import { Card, CardContent, CardHeader } from '../ui/card';
 import { TaskCard } from './task-card';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import { Task } from '@/types';
+import { Task, TaskStatus } from '@/types';
 
 export interface Column {
-  id: UniqueIdentifier;
+  id: TaskStatus;
   title: string;
 }
 
@@ -23,14 +23,9 @@ export interface ColumnDragData {
 interface BoardColumnProps {
   column: Column;
   tasks: Task[];
-  isOverlay?: boolean;
 }
 
-export function BoardColumn({
-  column,
-  tasks,
-  isOverlay
-}: Readonly<BoardColumnProps>) {
+export function BoardColumn({ column, tasks }: Readonly<BoardColumnProps>) {
   const tasksIds = useMemo(() => {
     return tasks.map((task) => task.id);
   }, [tasks]);
@@ -52,26 +47,11 @@ export function BoardColumn({
   };
 
   const variants = cva(
-    'h-[75vh] max-h-[75vh] col-span-1 max-w-full bg-gray-100 flex flex-col flex-shrink-0 snap-center',
-    {
-      variants: {
-        dragging: {
-          default: 'border-2 border-transparent',
-          over: 'ring-2 opacity-30',
-          overlay: 'ring-2 ring-primary'
-        }
-      }
-    }
+    'h-[80dvh] max-h-[80dvh] col-span-1 max-w-full bg-gray-100 flex flex-col flex-shrink-0 snap-center'
   );
 
   return (
-    <Card
-      ref={setNodeRef}
-      style={style}
-      className={variants({
-        dragging: isOverlay ? 'overlay' : isDragging ? 'over' : undefined
-      })}
-    >
+    <Card ref={setNodeRef} style={style} className={variants()}>
       <CardHeader className="flex flex-row items-center p-4 text-left font-semibold">
         <p className=" text-base">{column.title}</p>
       </CardHeader>

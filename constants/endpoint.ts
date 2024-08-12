@@ -5,7 +5,7 @@ export const BASE_API = 'https://talenthub.help';
 export const ENDPOINT = {
   LOGIN: '/auth/login/',
   EMPLOYEES: '/api/employees/',
-  EMPLOYEE: '/api/employee/',
+  CONTRACTS: '/api/contracts/',
   ME: '/me/',
   TICKETS: '/api/tickets/',
   TASKS: '/api/tasks/'

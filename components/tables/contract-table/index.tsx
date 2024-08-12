@@ -14,8 +14,8 @@ const Table: React.FC<Props> = ({ data }) => {
     <>
       <div className="flex items-start justify-between">
         <Heading
-          title={`Thực tập sinh / Cộng tác viên (${data.length})`}
-          description="Quản lí danh sách Thực tập sinh, cộng tác viên"
+          title={`Hợp đồng (${data.length})`}
+          description="Quản lí danh sách gia hạn hợp đồng của Thực tập sinh, cộng tác viên"
         />
       </div>
       <Separator />

@@ -30,24 +30,10 @@ import { ENDPOINT } from '@/constants/endpoint';
 import { useUserStore } from '@/store/user-store';
 import { ROLES } from '@/constants';
 import { Employee } from '@/types';
-import { Check, ChevronsUpDown, Plus } from 'lucide-react';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList
-} from '@/components/ui/command';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger
-} from '@/components/ui/popover';
+import { Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { FocusScope } from '@radix-ui/react-focus-scope';
-import { DismissableLayer } from '@radix-ui/react-dismissable-layer';
 import { useTaskStore } from '@/store/task-store';
+import { Combobox, ComboboxContent, ComboboxTrigger } from '../combobox';
 
 export default function CreateDialog() {
   const setKey = useTaskStore((state) => state.setKey);
@@ -78,13 +64,15 @@ export default function CreateDialog() {
   const [openCombobox, setOpenCombobox] = useState(false);
   const employees: Employee[] = fetcherEmployees.data?.results ?? [];
 
-  function handleSubmit(data: TaskSchema) {
-    fetcher.trigger({
-      body: {
-        ...data,
-        assignee: Number(data.assignee)
-      }
-    });
+  async function handleSubmit(data: TaskSchema) {
+    try {
+      fetcher.trigger({
+        body: {
+          ...data,
+          assignee: Number(data.assignee)
+        }
+      });
+    } catch (error) {}
   }
 
   useEffect(() => {
@@ -119,77 +107,47 @@ export default function CreateDialog() {
                 render={({ field }) => (
                   <FormItem className=" col-span-1 flex flex-col">
                     <FormLabel>Assignee</FormLabel>
-                    <Popover
+                    <Combobox
                       modal
                       open={openCombobox}
                       onOpenChange={setOpenCombobox}
                     >
-                      <FocusScope loop trapped>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              className={cn(
-                                'w-[320px] justify-between',
-                                !field.value && 'text-muted-foreground'
-                              )}
-                              disabled={fetcher.loading}
-                            >
-                              {field.value
-                                ? employees.find(
-                                    (employee) =>
-                                      employee?.id?.toString() === field.value
-                                  )?.username
-                                : 'Select assignee'}
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <DismissableLayer>
-                          <PopoverContent className="w-[320px] p-0">
-                            <Command>
-                              <CommandInput placeholder="Search assignee..." />
-                              <CommandList>
-                                <CommandEmpty>No employee found.</CommandEmpty>
-                                <CommandGroup>
-                                  {employees.map((employee) => (
-                                    <CommandItem
-                                      key={employee.id}
-                                      value={employee.username ?? ''}
-                                      onSelect={() => {
-                                        if (
-                                          employee?.id === undefined ||
-                                          employee?.id === null
-                                        )
-                                          return;
+                      <FormControl>
+                        <ComboboxTrigger
+                          className={cn(
+                            'w-[320px] justify-between',
+                            !field.value && 'text-muted-foreground'
+                          )}
+                          disabled={fetcher.loading}
+                        >
+                          {field.value
+                            ? employees.find(
+                                (employee) =>
+                                  employee?.id?.toString() === field.value
+                              )?.username
+                            : 'Select assignee'}
+                        </ComboboxTrigger>
+                      </FormControl>
+                      <ComboboxContent
+                        items={employees.map((item) => ({
+                          key: item.id ?? '',
+                          value: item.username ?? '',
+                          label: `${item.username} - ${item.email}`,
+                          rawValue: item.id,
+                          selected: field.value === item.id?.toString()
+                        }))}
+                        className="w-[320px] p-0"
+                        onSelect={(employee) => {
+                          if (!employee.rawValue) return;
 
-                                        form.setValue(
-                                          'assignee',
-                                          employee.id?.toString()
-                                        );
-                                        setOpenCombobox(false);
-                                      }}
-                                    >
-                                      <Check
-                                        className={cn(
-                                          'mr-2 h-4 w-4',
-                                          field.value ===
-                                            employee.id?.toString()
-                                            ? 'opacity-100'
-                                            : 'opacity-0'
-                                        )}
-                                      />
-                                      {employee.username} - {employee.email}
-                                    </CommandItem>
-                                  ))}
-                                </CommandGroup>
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </DismissableLayer>
-                      </FocusScope>
-                    </Popover>
+                          form.setValue(
+                            'assignee',
+                            employee.rawValue.toString()
+                          );
+                          setOpenCombobox(false);
+                        }}
+                      ></ComboboxContent>
+                    </Combobox>
                     <FormMessage />
                   </FormItem>
                 )}
