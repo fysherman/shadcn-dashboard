@@ -3,7 +3,7 @@ import { create } from 'zustand';
 
 export type State = {
   openDetail: boolean;
-  reportDetail?: Contract;
+  contractDetail?: Contract;
 };
 
 export type Actions = {

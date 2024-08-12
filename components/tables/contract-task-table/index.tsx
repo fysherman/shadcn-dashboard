@@ -1,10 +1,10 @@
 'use client';
 import { DataTable } from '@/components/ui/data-table';
 import { columns } from './columns';
-import { Task } from '@/types';
+import { ContractTask } from '@/types';
 
 interface Props {
-  data: Task[];
+  data: ContractTask[];
 }
 
 const Table: React.FC<Props> = ({ data }) => {

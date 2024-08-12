@@ -42,3 +42,31 @@ export const authSchema = z.object({
 });
 
 export type AuthSchema = z.infer<typeof authSchema>;
+
+export const contractTaskSchema = z.object({
+  title: z.string().min(1),
+  result: z.string().min(1)
+});
+
+export type ContractTaskSchema = z.infer<typeof contractTaskSchema>;
+
+export const contractScoreSchema = z.object({
+  efficiency: z.string(),
+  learning_ability: z.string(),
+  responsibility: z.string(),
+  collaboration: z.string(),
+  attitude: z.string(),
+  adaptability: z.string(),
+  mentor_proposal: z.string(),
+  salary_proposal: z.string().optional()
+});
+
+export type ContractScoreSchema = z.infer<typeof contractScoreSchema>;
+
+export const contractFinalSchema = z.object({
+  new_contract_confirm: z.string(),
+  collaborator_salary: z.string().optional(),
+  other_salary: z.string().optional()
+});
+
+export type ContractFinalSchema = z.infer<typeof contractFinalSchema>;

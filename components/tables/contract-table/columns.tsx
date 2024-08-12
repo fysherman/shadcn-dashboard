@@ -4,20 +4,7 @@ import { CellAction } from './cell-action';
 import { Contract } from '@/types';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
-import { CONTRACT_STATUS } from '@/constants';
-
-function getStatusVariant(status?: string) {
-  switch (status) {
-    case CONTRACT_STATUS.COLLABORATOR_SUBMITTED:
-      return 'bg-amber-500';
-    case CONTRACT_STATUS.MENTOR_REVIEWED:
-      return 'bg-blue-500';
-    case CONTRACT_STATUS.MANAGER_REVIEWED:
-      return 'bg-green-500';
-    default:
-      return 'bg-gray-500';
-  }
-}
+import { getStatusName, getStatusVariant } from './helpers';
 
 export const columns: ColumnDef<Contract>[] = [
   {
@@ -29,8 +16,8 @@ export const columns: ColumnDef<Contract>[] = [
     header: 'Trạng thái',
     cell({ row }) {
       return (
-        <Badge className={getStatusVariant(row.original.status ?? '')}>
-          {row.original.status}
+        <Badge className={getStatusVariant(row.original.status ?? undefined)}>
+          {getStatusName(row.original.status ?? undefined)}
         </Badge>
       );
     }

@@ -126,6 +126,12 @@ export type ContractStatus =
   | 'MENTOR_REVIEWED'
   | 'MANAGER_REVIEWED';
 
+export interface ContractTask {
+  index: number;
+  title: string;
+  result: string;
+}
+
 export type Contract = Nullable<{
   id: number;
   title: string;
@@ -139,8 +145,26 @@ export type Contract = Nullable<{
   hr_name: number;
   manager: number;
   manager_name: string;
-  manager_review: any;
+  manager_review: Record<string, ContractEvaluationCriteria>;
   mentor: number;
-  mentor_name: number;
-  mentor_review: number;
+  mentor_name: string;
+  mentor_review: Record<string, ContractEvaluationCriteria>;
+  collaborator_name: string;
+  collaborator: number;
+  tasks: ContractTask[];
 }>;
+
+export type ContractEvaluationCriteria =
+  | 'GOOD'
+  | 'ABOVE_AVERAGE'
+  | 'AVERAGE'
+  | 'PASS'
+  | 'FAIL'
+  | 'EXTEND_CONTRACT'
+  | 'TERMINATE_CONTRACT'
+  | 'YES'
+  | 'NO'
+  | 'AGREE'
+  | 'DISAGREE'
+  | 'RETAIN'
+  | 'AGREE_WITH_MENTOR';

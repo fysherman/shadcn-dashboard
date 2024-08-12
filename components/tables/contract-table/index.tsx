@@ -5,6 +5,7 @@ import { Separator } from '@/components/ui/separator';
 import { columns } from './columns';
 import { Contract } from '@/types';
 import CreateDialog from './create-dialog';
+import DetailDialog from './detail-dialog';
 
 interface Props {
   data: Contract[];
@@ -28,6 +29,7 @@ const Table: React.FC<Props> = ({ data, reload }) => {
         data={data}
         height=" h-[calc(100vh-260px)]"
       />
+      <DetailDialog reload={reload} />
     </>
   );
 };
