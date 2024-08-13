@@ -29,7 +29,7 @@ const Table: React.FC<Props> = ({ data, reload }) => {
         data={data}
         height=" h-[calc(100vh-260px)]"
       />
-      <DetailDialog />
+      <DetailDialog reload={reload} />
     </>
   );
 };

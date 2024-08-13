@@ -14,13 +14,20 @@ import {
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { profileSchema, ProfileSchema } from '@/lib/form-schema';
-import { Label } from '@/components/ui/label';
 import { useUserStore } from '@/store/user-store';
 import useFetcher from '@/lib/fetcher';
 import { ENDPOINT } from '@/constants/endpoint';
 import { useEffect } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { upperCaseFirstLetter } from '@/lib/utils';
+import { cn, upperCaseFirstLetter } from '@/lib/utils';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger
+} from '@/components/ui/popover';
+import { format } from 'date-fns';
+import { CalendarIcon } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
 
 export function ProfileForm() {
   const user = useUserStore((state) => state.user);
@@ -36,15 +43,28 @@ export function ProfileForm() {
   });
 
   function handleSubmit(body: ProfileSchema) {
-    fetcher.trigger({
-      body: Object.entries(body).reduce((result, [key, value]) => {
+    const parsedBody = Object.entries(body).reduce<ProfileSchema>(
+      (result, [key, value]) => {
         if (!value) return result;
+
+        let parsedValue = value;
+
+        if (
+          ['birth_date', 'identification_issued_date'].includes(key) &&
+          value instanceof Date
+        )
+          parsedValue = format(value, 'yyyy-MM-dd');
 
         return {
           ...result,
-          [key]: value
+          [key]: parsedValue
         };
-      }, {})
+      },
+      {}
+    );
+
+    fetcher.trigger({
+      body: parsedBody
     });
   }
 
@@ -53,12 +73,14 @@ export function ProfileForm() {
 
     form.reset({
       address: user?.address ?? '',
-      birth_date: user?.birth_date ?? '',
+      birth_date: user?.birth_date ? new Date(user.birth_date) : undefined,
       bank_account: user?.bank_account ?? '',
       bank_name: user?.bank_name ?? '',
       bank_center: user?.bank_center ?? '',
       identification_card: user?.identification_card ?? '',
-      identification_issued_date: user?.identification_issued_date ?? '',
+      identification_issued_date: user?.identification_issued_date
+        ? new Date(user.identification_issued_date)
+        : undefined,
       identification_issued_place: user?.identification_issued_place ?? '',
       emergency_contact_name: user?.emergency_contact_name ?? '',
       emergency_contact_phone: user?.emergency_contact_phone ?? '',
@@ -119,11 +141,37 @@ export function ProfileForm() {
             control={form.control}
             name="birth_date"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className=" flex flex-col space-y-[18px]">
                 <FormLabel>Ngày sinh</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
+                <Popover modal>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant={'outline'}
+                        className={cn(
+                          'w-[240px] pl-3 text-left font-normal',
+                          !field.value && 'text-muted-foreground'
+                        )}
+                        disabled={fetcher.loading}
+                      >
+                        {field.value ? (
+                          format(field.value, 'PPP')
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value}
+                      onSelect={field.onChange}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
                 <FormMessage />
               </FormItem>
             )}
@@ -233,11 +281,37 @@ export function ProfileForm() {
             control={form.control}
             name="identification_issued_date"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className=" flex flex-col space-y-[18px]">
                 <FormLabel>Ngày cấp</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant={'outline'}
+                        className={cn(
+                          'w-[240px] pl-3 text-left font-normal',
+                          !field.value && 'text-muted-foreground'
+                        )}
+                        disabled={fetcher.loading}
+                      >
+                        {field.value ? (
+                          format(field.value, 'PPP')
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value}
+                      onSelect={field.onChange}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
                 <FormMessage />
               </FormItem>
             )}

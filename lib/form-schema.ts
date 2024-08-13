@@ -72,10 +72,10 @@ export const contractFinalSchema = z.object({
 export type ContractFinalSchema = z.infer<typeof contractFinalSchema>;
 
 export const profileSchema = z.object({
-  address: z.string().min(1),
+  address: z.string().optional(),
   image_profile: z.string().optional(),
-  birth_date: z.string().min(1),
-  phone: z.string().min(1),
+  birth_date: z.date().optional(),
+  phone: z.string().optional(),
   tax_id: z.string().optional(),
   bank_account: z.string().optional(),
   bank_center: z.string().optional(),
@@ -83,7 +83,7 @@ export const profileSchema = z.object({
   identification_back_image: z.string().optional(),
   identification_front_image: z.string().optional(),
   identification_card: z.string().optional(),
-  identification_issued_date: z.string().optional(),
+  identification_issued_date: z.date().optional(),
   identification_issued_place: z.string().optional(),
   emergency_contact_name: z.string().optional(),
   emergency_contact_phone: z.string().optional()

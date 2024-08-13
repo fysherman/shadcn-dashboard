@@ -101,7 +101,7 @@ export type Task = {
   index: number;
 };
 
-export type ReportStatus = 'PENDING' | 'DONE';
+export type ReportStatus = 'PENDING' | 'DONE' | 'SUBMITTED';
 
 export type Report = Nullable<{
   id: number;

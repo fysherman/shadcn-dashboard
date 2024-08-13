@@ -4,6 +4,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog';
@@ -14,10 +15,25 @@ import { format } from 'date-fns';
 import TaskTable from '../task-table';
 import { Badge } from '@/components/ui/badge';
 import { useReportStore } from '@/store/report-store';
+import { Button } from '@/components/ui/button';
+import useFetcher from '@/lib/fetcher';
+import { ENDPOINT } from '@/constants/endpoint';
+import { toast } from 'sonner';
+import { getStatusVariant } from './helpers';
 
-export default function DetailDialog() {
+export default function DetailDialog({
+  reload
+}: Readonly<{ reload: () => void }>) {
   const open = useReportStore((state) => state.openDetail);
   const report = useReportStore((state) => state.reportDetail);
+  const fetcher = useFetcher({
+    method: 'POST',
+    onSuccess() {
+      toast.success('Submit báo cáo lên hệ thống Uservice thành công');
+      reload();
+      setOpen(false);
+    }
+  });
   const closeDetail = useReportStore((state) => state.closeDetail);
   const submitterName = report?.created_by_name;
   const approverName = report?.approved_by_name;
@@ -28,6 +44,13 @@ export default function DetailDialog() {
     closeDetail();
   }
 
+  function submitUservice() {
+    fetcher.trigger({
+      url: `${ENDPOINT.REPORTS}${report?.id}/submit/`,
+      body: report
+    });
+  }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className=" max-w-2xl">
@@ -36,7 +59,7 @@ export default function DetailDialog() {
           <DialogDescription>Chi tiết báo cáo</DialogDescription>
         </DialogHeader>
         <div className=" space-y-4 py-4">
-          <Badge variant={report?.status === 'DONE' ? 'default' : 'secondary'}>
+          <Badge className={getStatusVariant(report?.status ?? undefined)}>
             {report?.status}
           </Badge>
           <div className=" grid grid-cols-4 items-center gap-4">
@@ -85,6 +108,13 @@ export default function DetailDialog() {
         <div className="mt-4">
           <TaskTable data={report?.tasks ?? []} />
         </div>
+        {report?.status && report.status !== 'SUBMITTED' && (
+          <DialogFooter className=" mt-4">
+            <Button onClick={submitUservice} disabled={fetcher.loading}>
+              Submit báo cáo lên Uservice
+            </Button>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   );

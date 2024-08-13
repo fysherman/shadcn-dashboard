@@ -4,6 +4,7 @@ import { CellAction } from './cell-action';
 import { Report } from '@/types';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
+import { getStatusVariant } from './helpers';
 
 export const columns: ColumnDef<Report>[] = [
   {
@@ -15,9 +16,7 @@ export const columns: ColumnDef<Report>[] = [
     header: 'Trạng thái',
     cell({ row }) {
       return (
-        <Badge
-          variant={row.original.status === 'DONE' ? 'default' : 'secondary'}
-        >
+        <Badge className={getStatusVariant(row.original?.status ?? undefined)}>
           {row.original.status}
         </Badge>
       );
