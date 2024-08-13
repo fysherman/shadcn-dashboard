@@ -30,9 +30,6 @@ export function DashboardNav({
         .filter((item) => !item.roles || (role && item.roles.includes(role)))
         .map((item, index) => {
           const Icon = item.icon;
-          console.log(path.startsWith(item.href ?? ''));
-          console.log('🚀 ~ path:', path);
-          console.log('🚀 ~ item.href:', item.href);
 
           return (
             item.href && (
