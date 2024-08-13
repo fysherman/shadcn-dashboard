@@ -23,7 +23,7 @@ export default function Page() {
     <PageContainer>
       <div className="space-y-2">
         <Breadcrumbs items={breadcrumbItems} />
-        <QuitTable data={quits} reload={() => {}} />
+        <QuitTable data={quits} reload={fetcher.trigger} />
       </div>
     </PageContainer>
   );
