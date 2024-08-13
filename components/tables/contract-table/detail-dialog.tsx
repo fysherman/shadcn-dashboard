@@ -78,7 +78,7 @@ export default function DetailDialog({
       attitude: CONTRACT_EVALUATION_CRITERIA.GOOD,
       adaptability: CONTRACT_EVALUATION_CRITERIA.PASS,
       mentor_proposal: CONTRACT_EVALUATION_CRITERIA.EXTEND_CONTRACT,
-      salary_proposal: CONTRACT_EVALUATION_CRITERIA.RETAIN
+      salary_proposal: ''
     }
   });
   const finalForm = useForm<ContractFinalSchema>({
@@ -108,6 +108,7 @@ export default function DetailDialog({
 
     return fetcher.loading || emptyLocalTask || hasDraftTask;
   }, [fetcher.loading, localTasks.length, hasDraftTask]);
+  const salaryOption = finalForm.watch('collaborator_salary');
 
   function setOpen(state: boolean) {
     if (state) return;
@@ -155,27 +156,28 @@ export default function DetailDialog({
     const body: Record<string, any> = {
       title: contract?.title
     };
+    const values = finalForm.getValues();
 
-    if (CONTRACT_STATUS.HR_CREATED) {
-      body.status = CONTRACT_STATUS.COLLABORATOR_SUBMITTED;
-      body.tasks = localTasks;
-    }
-
-    if (CONTRACT_STATUS.COLLABORATOR_SUBMITTED) {
-      body.status = CONTRACT_STATUS.MENTOR_REVIEWED;
-      body.mentor_review = scoreForm.getValues();
-    }
-
-    if (CONTRACT_STATUS.MENTOR_REVIEWED) {
-      const values = finalForm.getValues();
-
-      body.status = CONTRACT_STATUS.MANAGER_REVIEWED;
-      body.manager_review = {
-        new_contract_confirm: values.new_contract_confirm,
-        collaborator_salary: values.other_salary
-          ? values.other_salary
-          : values.collaborator_salary
-      };
+    switch (contract?.status) {
+      case CONTRACT_STATUS.HR_CREATED:
+        body.status = CONTRACT_STATUS.COLLABORATOR_SUBMITTED;
+        body.tasks = localTasks;
+        break;
+      case CONTRACT_STATUS.COLLABORATOR_SUBMITTED:
+        body.status = CONTRACT_STATUS.MENTOR_REVIEWED;
+        body.mentor_review = scoreForm.getValues();
+        break;
+      case CONTRACT_STATUS.MENTOR_REVIEWED:
+        body.status = CONTRACT_STATUS.MANAGER_REVIEWED;
+        body.manager_review = {
+          new_contract_confirm: values.new_contract_confirm,
+          collaborator_salary: values.other_salary
+            ? values.other_salary
+            : values.collaborator_salary
+        };
+        break;
+      default:
+        break;
     }
 
     fetcher.trigger({
@@ -762,27 +764,41 @@ export default function DetailDialog({
                                 Đồng ý với đề xuất Mentor
                               </Label>
                             </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem
+                                value={CONTRACT_EVALUATION_CRITERIA.OTHER}
+                                id="collaborator_salary-2"
+                                disabled={
+                                  fetcher.loading || contractLevel !== 3
+                                }
+                              />
+                              <Label htmlFor="collaborator_salary-2">
+                                Số khác
+                              </Label>
+                            </div>
                           </RadioGroup>
                         </FormControl>
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={finalForm.control}
-                    name="other_salary"
-                    render={({ field }) => (
-                      <FormItem className=" flex items-center space-x-4 space-y-0">
-                        <FormControl>
-                          <Input
-                            {...field}
-                            placeholder="Số khác"
-                            disabled={fetcher.loading || contractLevel !== 3}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  {salaryOption === CONTRACT_EVALUATION_CRITERIA.OTHER && (
+                    <FormField
+                      control={finalForm.control}
+                      name="other_salary"
+                      render={({ field }) => (
+                        <FormItem className=" flex items-center space-x-4 space-y-0">
+                          <FormControl>
+                            <Input
+                              {...field}
+                              placeholder="Số khác"
+                              disabled={fetcher.loading || contractLevel !== 3}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
                 </div>
               </form>
             </Form>

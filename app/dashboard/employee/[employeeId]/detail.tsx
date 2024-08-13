@@ -172,6 +172,7 @@ export function Detail() {
                 Đề nghị gia hạn hợp đồng
               </Link>
             </DropdownMenuItem>
+            <DropdownMenuItem>Update Mentor của CTV/TTS</DropdownMenuItem>
             <DropdownMenuItem>Export dữ liệu hợp đồng</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

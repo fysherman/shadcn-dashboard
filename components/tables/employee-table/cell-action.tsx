@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { Employee } from '@/types';
-import { MoreHorizontal, User } from 'lucide-react';
+import { MoreHorizontal, Pencil, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -46,6 +46,9 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
             onClick={() => router.push(`/dashboard/employee/${data.id}`)}
           >
             <User className="mr-2 h-4 w-4" /> Chi tiết
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <Pencil className="mr-2 h-4 w-4" /> Update Mentor của CTV/TTS
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

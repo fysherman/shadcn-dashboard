@@ -168,4 +168,5 @@ export type ContractEvaluationCriteria =
   | 'AGREE'
   | 'DISAGREE'
   | 'RETAIN'
-  | 'AGREE_WITH_MENTOR';
+  | 'AGREE_WITH_MENTOR'
+  | 'OTHER';

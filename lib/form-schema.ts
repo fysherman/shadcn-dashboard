@@ -30,7 +30,7 @@ export const contractSchema = z.object({
   title: z.string().min(1),
   from_date: z.date(),
   to_date: z.date(),
-  desc: z.string(),
+  desc: z.string().optional(),
   collaborator: z.string().min(1)
 });
 

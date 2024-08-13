@@ -5,7 +5,8 @@ import {
   FileStack,
   LayoutDashboardIcon,
   PenTool,
-  SquareKanban
+  SquareKanban,
+  UserMinus
 } from 'lucide-react';
 
 export type Employee = {
@@ -50,7 +51,7 @@ export const navItems: NavItem[] = [
     roles: [ROLES.HR, ROLES.MANAGER, ROLES.MENTOR, ROLES.COLLABORATOR]
   },
   {
-    title: 'Báo cáo',
+    title: 'Báo cáo tháng',
     href: '/dashboard/report',
     icon: FileStack,
     label: 'report',
@@ -61,6 +62,13 @@ export const navItems: NavItem[] = [
     href: '/dashboard/contract',
     icon: PenTool,
     label: 'contract',
+    roles: [ROLES.HR, ROLES.MANAGER, ROLES.MENTOR, ROLES.COLLABORATOR]
+  },
+  {
+    title: 'Thông báo nghỉ việc',
+    href: '/dashboard/quit/',
+    icon: UserMinus,
+    label: 'quit',
     roles: [ROLES.HR, ROLES.MANAGER, ROLES.MENTOR, ROLES.COLLABORATOR]
   }
 ];
