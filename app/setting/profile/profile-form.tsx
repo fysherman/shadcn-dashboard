@@ -1,164 +1,142 @@
 'use client';
 
-import Link from 'next/link';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useFieldArray, useForm } from 'react-hook-form';
-import { z } from 'zod';
-
-import { cn } from '@/lib/utils';
+import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-
-const profileFormSchema = z.object({
-  username: z
-    .string()
-    .min(2, {
-      message: 'Username must be at least 2 characters.'
-    })
-    .max(30, {
-      message: 'Username must not be longer than 30 characters.'
-    }),
-  email: z
-    .string({
-      required_error: 'Please select an email to display.'
-    })
-    .email(),
-  bio: z.string().max(160).min(4),
-  urls: z
-    .array(
-      z.object({
-        value: z.string().url({ message: 'Please enter a valid URL.' })
-      })
-    )
-    .optional()
-});
-
-type ProfileFormValues = z.infer<typeof profileFormSchema>;
-
-// This can come from your database or API.
-const defaultValues: Partial<ProfileFormValues> = {
-  bio: 'I own a computer.',
-  urls: [
-    { value: 'https://shadcn.com' },
-    { value: 'http://twitter.com/shadcn' }
-  ]
-};
+import { profileSchema, ProfileSchema } from '@/lib/form-schema';
+import { Label } from '@/components/ui/label';
+import { useUserStore } from '@/store/user-store';
+import useFetcher from '@/lib/fetcher';
+import { ENDPOINT } from '@/constants/endpoint';
+import { useEffect } from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { upperCaseFirstLetter } from '@/lib/utils';
 
 export function ProfileForm() {
-  const form = useForm<ProfileFormValues>({
-    resolver: zodResolver(profileFormSchema),
-    defaultValues,
-    mode: 'onChange'
+  const user = useUserStore((state) => state.user);
+  const form = useForm<ProfileSchema>({
+    resolver: zodResolver(profileSchema)
+  });
+  const fetcher = useFetcher({
+    url: ENDPOINT.ME,
+    method: 'PUT',
+    onSuccess() {
+      toast.success('Cập nhật thành công');
+    }
   });
 
-  const { fields, append } = useFieldArray({
-    name: 'urls',
-    control: form.control
-  });
+  function handleSubmit(body: ProfileSchema) {
+    fetcher.trigger({
+      body: Object.entries(body).reduce((result, [key, value]) => {
+        if (!value) return result;
 
-  function onSubmit(data: ProfileFormValues) {
-    toast('Error');
+        return {
+          ...result,
+          [key]: value
+        };
+      }, {})
+    });
   }
+
+  useEffect(() => {
+    if (!user?.username) return;
+
+    form.reset({
+      address: user?.address ?? '',
+      birth_date: user?.birth_date ?? '',
+      bank_account: user?.bank_account ?? '',
+      bank_name: user?.bank_name ?? '',
+      bank_center: user?.bank_center ?? '',
+      identification_card: user?.identification_card ?? '',
+      identification_issued_date: user?.identification_issued_date ?? '',
+      identification_issued_place: user?.identification_issued_place ?? '',
+      emergency_contact_name: user?.emergency_contact_name ?? '',
+      emergency_contact_phone: user?.emergency_contact_phone ?? '',
+      tax_id: user?.tax_id ?? '',
+      phone: user?.phone ?? ''
+    });
+  }, [user]);
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <FormField
-          control={form.control}
-          name="username"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Username</FormLabel>
-              <FormControl>
-                <Input placeholder="shadcn" {...field} />
-              </FormControl>
-              <FormDescription>
-                This is your public display name. It can be your real name or a
-                pseudonym. You can only change this once every 30 days.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+        <div className=" my-8 flex items-center space-x-4">
+          <Avatar className=" h-32 w-32">
+            <AvatarImage
+              src={user?.image_profile ?? undefined}
+              alt={user?.username ?? undefined}
+            />
+            <AvatarFallback>
+              <p className=" text-5xl font-bold">
+                {upperCaseFirstLetter(user?.username)}
+              </p>
+            </AvatarFallback>
+          </Avatar>
+          <div className=" space-y-1">
+            <h3 className=" text-2xl font-semibold">{user?.username}</h3>
+            <p className=" text-gray-500">{user?.fullname}</p>
+            <p className=" text-gray-500">{user?.email}</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-3 gap-4">
+          <FormField
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Số điện thoại</FormLabel>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a verified email to display" />
-                  </SelectTrigger>
+                  <Input {...field} />
                 </FormControl>
-                <SelectContent>
-                  <SelectItem value="m@example.com">m@example.com</SelectItem>
-                  <SelectItem value="m@google.com">m@google.com</SelectItem>
-                  <SelectItem value="m@support.com">m@support.com</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormDescription>
-                You can manage verified email addresses in your{' '}
-                <Link href="/examples/forms">email settings</Link>.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="bio"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Bio</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Tell us a little bit about yourself"
-                  className="resize-none"
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription>
-                You can <span>@mention</span> other users and organizations to
-                link to them.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div>
-          {fields.map((field, index) => (
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="tax_id"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Mã số thuế</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="birth_date"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Ngày sinh</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="grid grid-cols-3 gap-4">
+          <div className="col-span-2">
             <FormField
               control={form.control}
-              key={field.id}
-              name={`urls.${index}.value`}
+              name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className={cn(index !== 0 && 'sr-only')}>
-                    URLs
-                  </FormLabel>
-                  <FormDescription className={cn(index !== 0 && 'sr-only')}>
-                    Add links to your website, blog, or social media profiles.
-                  </FormDescription>
+                  <FormLabel>Địa chỉ</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -166,18 +144,119 @@ export function ProfileForm() {
                 </FormItem>
               )}
             />
-          ))}
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="mt-2"
-            onClick={() => append({ value: '' })}
-          >
-            Add URL
-          </Button>
+          </div>
         </div>
-        <Button type="submit">Update profile</Button>
+        <div className="grid grid-cols-3 gap-4">
+          <FormField
+            control={form.control}
+            name="bank_account"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tài khoản ngân hàng</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="bank_name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Ngân hàng</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="bank_center"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Chi nhánh</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="emergency_contact_phone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Số điện thoại khẩn cấp</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="emergency_contact_name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tên người liên lạc</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="grid grid-cols-3 gap-4">
+          <FormField
+            control={form.control}
+            name="identification_card"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Căn cước</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="identification_issued_date"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Ngày cấp</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="identification_issued_place"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nơi cấp</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <Button type="submit">Cập nhật profile</Button>
       </form>
     </Form>
   );
