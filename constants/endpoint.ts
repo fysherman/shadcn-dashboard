@@ -9,5 +9,6 @@ export const ENDPOINT = {
   REPORTS: '/api/reports/',
   TICKETS: '/api/tickets/',
   TASKS: '/api/tasks/',
+  RESIGNS: '/api/resigns/',
   ME: '/me/'
 };

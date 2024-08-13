@@ -7,16 +7,16 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { useReportStore } from '@/store/report-store';
-import { Report } from '@/types';
+import { useQuitStore } from '@/store/quit-store';
+import { Quit } from '@/types';
 import { MoreHorizontal, Package } from 'lucide-react';
 
 interface CellActionProps {
-  data: Report;
+  data: Quit;
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
-  const setOpenDetail = useReportStore((state) => state.setOpenDetail);
+  const setOpenDetail = useQuitStore((state) => state.setOpenDetail);
 
   return (
     <DropdownMenu modal={false}>

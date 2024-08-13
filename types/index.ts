@@ -170,3 +170,16 @@ export type ContractEvaluationCriteria =
   | 'RETAIN'
   | 'AGREE_WITH_MENTOR'
   | 'OTHER';
+
+export type Quit = Nullable<{
+  id: number;
+  title: string;
+  end_date: string;
+  created: string;
+  updated: string;
+  collaborator_name: string;
+  mentor_id: number;
+  mentor_name: string;
+  manager_id: number;
+  manager_name: string;
+}>;

@@ -3,12 +3,12 @@ import { DataTable } from '@/components/ui/data-table';
 import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
 import { columns } from './columns';
-import { Report } from '@/types';
+import { Quit } from '@/types';
 import CreateDialog from './create-dialog';
 import DetailDialog from './detail-dialog';
 
 interface Props {
-  data: Report[];
+  data: Quit[];
   reload: () => void;
 }
 

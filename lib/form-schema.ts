@@ -90,3 +90,10 @@ export const profileSchema = z.object({
 });
 
 export type ProfileSchema = z.infer<typeof profileSchema>;
+
+export const quitSchema = z.object({
+  title: z.string().min(1),
+  end_date: z.date()
+});
+
+export type QuitSchema = z.infer<typeof quitSchema>;
