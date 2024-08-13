@@ -16,6 +16,7 @@ import { LayoutGrid } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import ContractTable from '@/components/tables/contract-table';
 
 export function Detail() {
   const params = useParams();
@@ -24,6 +25,15 @@ export function Detail() {
     method: 'GET',
     triggerOnMount: true
   });
+  const contractFetcher = useFetcher({
+    url: ENDPOINT.CONTRACTS,
+    params: {
+      collaborator: params.employeeId
+    },
+    triggerOnMount: true
+  });
+
+  const contracts = contractFetcher.data?.results ?? [];
   const user: Employee = fetcher.data;
 
   return (
@@ -134,6 +144,10 @@ export function Detail() {
           alt="identification_back_image"
           style={{ width: '100%', height: 'auto' }}
         />
+      </div>
+      <div className=" col-span-3 space-y-2">
+        <Label>Danh sách hợp đồng</Label>
+        <ContractTable mini data={contracts} reload={contractFetcher.trigger} />
       </div>
       <div className="col-span-3 flex space-x-2 pt-4">
         <DropdownMenu>

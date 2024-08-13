@@ -9,25 +9,31 @@ import DetailDialog from './detail-dialog';
 
 interface Props {
   data: Contract[];
+  mini?: boolean;
   reload: () => void;
 }
 
-const Table: React.FC<Props> = ({ data, reload }) => {
+const Table: React.FC<Props> = ({ data, reload, mini = false }) => {
   return (
     <>
-      <div className="flex items-start justify-between">
-        <Heading
-          title={`Hợp đồng (${data.length})`}
-          description="Quản lí danh sách gia hạn hợp đồng của Thực tập sinh, cộng tác viên"
-        />
-        <CreateDialog reload={reload} />
-      </div>
-      <Separator />
+      {!mini && (
+        <>
+          <div className="flex items-start justify-between">
+            <Heading
+              title={`Hợp đồng (${data.length})`}
+              description="Quản lí danh sách gia hạn hợp đồng của Thực tập sinh, cộng tác viên"
+            />
+            <CreateDialog reload={reload} />
+          </div>
+          <Separator />
+        </>
+      )}
       <DataTable
         searchKey="title"
+        searchable={!mini}
         columns={columns}
         data={data}
-        height=" h-[calc(100vh-260px)]"
+        height={mini ? 'h-auto' : ' h-[calc(100vh-260px)]'}
       />
       <DetailDialog reload={reload} />
     </>
